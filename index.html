@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — Wedding Info</title>
+
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      margin: 0;
+      font-size: 3rem;
+      color: var(--color-primary);
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: var(--color-text);
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .nav-card {
+      background: white;
+      border-radius: 16px;
+      padding: 35px 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 14px var(--shadow);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .nav-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .nav-card h2 {
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      color: var(--color-text);
+    }
+
+    .nav-card p {
+      margin-bottom: 25px;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      text-decoration: none;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .btn:hover {
+      background: #b57753;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--color-secondary);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 500px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .nav-card {
+        padding: 25px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Toluwani & Temilola</h1>
+  <p>Welcome, dear guests — explore everything you need for our wedding weekend</p>
+</header>
+
+<section class="container">
+
+  <div class="nav-card">
+    <h2>Wedding FAQ</h2>
+    <p>Find answers to common questions about the wedding day — timing, dress code, parking, photography, and more.</p>
+    <a href="faq.html" class="btn">View FAQ</a>
+  </div>
+
+  <div class="nav-card">
+    <h2>Things To Do in Town</h2>
+    <p>Explore our favorite places to eat, visit, relax, and enjoy while you're here for the celebration.</p>
+    <a href="guide.html" class="btn">Explore Guide</a>
+  </div>
+
+</section>
+
+<footer>
+  With love, Toluwani & Temilola 💕
+</footer>
+
+</body>
+</html>
