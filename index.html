@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — Wedding FAQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-primary: #8B5E83;
+      --color-secondary: #F3E9E5;
+      --color-text: #4A3F4A;
+      --color-bg: #FAF9F7;
+      --faq-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+    }
+
+    header {
+      text-align: center;
+      padding: 80px 20px 40px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: var(--color-text);
+    }
+
+    .faq-section {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    /* Accordion Button */
+    .accordion {
+      background: var(--faq-bg);
+      color: var(--color-text);
+      cursor: pointer;
+      padding: 20px 25px;
+      width: 100%;
+      border: 2px solid transparent;
+      text-align: left;
+      outline: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px var(--shadow);
+      position: relative;
+      font-family: 'Playfair Display', serif;
+      transition: border 0.3s ease, background 0.3s ease;
+    }
+
+    /* Soft glowing border when open */
+    .accordion.active {
+      border: 2px solid var(--color-primary);
+      background: #f8f3f6;
+    }
+
+    /* Rotating icon */
+    .accordion:after {
+      content: '⌄';
+      font-size: 1.4rem;
+      color: var(--color-primary);
+      position: absolute;
+      right: 25px;
+      top: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion.active:after {
+      transform: rotate(180deg);
+    }
+
+    .panel {
+      background: var(--faq-bg);
+      overflow: hidden;
+      max-height: 0;
+      border-radius: 0 0 12px 12px;
+      transition: max-height 0.3s ease-out;
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-top: -10px;
+      margin-bottom: 20px;
+      padding: 0 25px;
+    }
+
+    .panel-content {
+      padding: 15px 0 20px;
+    }
+
+    .panel-content p {
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: var(--color-text);
+      font-size: 0.9rem;
+      background: var(--color-secondary);
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Toluwani & Temilola</h1>
+  <p>Wedding FAQ — Everything you need to know</p>
+</header>
+
+<section class="faq-section">
+
+  <button class="accordion">📍 Where is the wedding?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Insert venue name + address]</p>
+  </div></div>
+
+  <button class="accordion">⏰ What time should I arrive?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Please arrive 15–20 minutes early to be seated before the ceremony begins.]</p>
+  </div></div>
+
+  <button class="accordion">👗 What is the dress code?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Example: Cocktail attire / Semi-formal]</p>
+  </div></div>
+
+  <button class="accordion">🍽 Will there be food?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Yes! Dinner and drinks will be provided. Please let us know about allergies.]</p>
+  </div></div>
+
+  <button class="accordion">🎁 Should I bring a gift?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Your presence is the best gift. But if you’d like, our registry is here: ___]</p>
+  </div></div>
+
+  <button class="accordion">🚗 Is parking available?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Insert parking instructions]</p>
+  </div></div>
+
+  <button class="accordion">📱 Can I take photos?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[We kindly ask for an unplugged ceremony — please keep your phones tucked away until the reception.]</p>
+  </div></div>
+
+  <button class="accordion">❓ Anything else I should know?</button>
+  <div class="panel"><div class="panel-content">
+    <p>[Add any special notes, schedule, shuttle info, or accommodations.]</p>
+  </div></div>
+
+</section>
+
+<footer>
+  Made with love by Toluwani & Temilola 💕
+</footer>
+
+<script>
+  const accordions = document.querySelectorAll(".accordion");
+
+  accordions.forEach((accordion) => {
+    accordion.addEventListener("click", function () {
+
+      // Close all other accordions
+      accordions.forEach((other) => {
+        if (other !== this && other.classList.contains("active")) {
+          other.classList.remove("active");
+          other.nextElementSibling.style.maxHeight = null;
+        }
+      });
+
+      // Toggle current
+      this.classList.toggle("active");
+      const panel = this.nextElementSibling;
+
+      if (panel.style.maxHeight) {
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = panel.scrollHeight + "px";
+      }
+
+    });
+  });
+</script>
+
+</body>
+</html>
