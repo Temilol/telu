@@ -4,15 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Toluwani & Temilola — Wedding FAQ</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.png" />
+
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --color-primary: #8B5E83;
-      --color-secondary: #F3E9E5;
-      --color-text: #4A3F4A;
-      --color-bg: #FAF9F7;
-      --faq-bg: #FFFFFF;
+      --color-primary: #C68A65;       /* rose-gold copper accent (logo color) */
+      --color-secondary: #E9D6CF;     /* soft clay blush */
+      --color-text: #3B2F2F;          /* warm charcoal plum */
+      --color-bg: #F8F4F1;            /* ivory background */
+      --faq-bg: #FFFFFF;              /* clean whites */
       --shadow: rgba(0, 0, 0, 0.06);
     }
 
@@ -22,11 +26,17 @@
       color: var(--color-text);
       background-color: var(--color-bg);
     }
-
+    
     header {
       text-align: center;
-      padding: 80px 20px 40px;
+      padding: 0px 20px 25px;
       background: var(--color-secondary);
+    }
+
+    .wedding-logo {
+      width: 160px;
+      max-width: 60%;
+      margin-bottom: 0px;
     }
 
     header h1 {
@@ -48,7 +58,6 @@
       padding: 0 20px;
     }
 
-    /* Accordion Button */
     .accordion {
       background: var(--faq-bg);
       color: var(--color-text);
@@ -68,13 +77,11 @@
       transition: border 0.3s ease, background 0.3s ease;
     }
 
-    /* Soft glowing border when open */
     .accordion.active {
       border: 2px solid var(--color-primary);
       background: #f8f3f6;
     }
 
-    /* Rotating icon */
     .accordion:after {
       content: '⌄';
       font-size: 1.4rem;
@@ -123,6 +130,9 @@
 <body>
 
 <header>
+  <!-- Logo Above Title -->
+  <img src="logo.png" alt="Wedding Logo" class="wedding-logo" />
+
   <h1>Toluwani & Temilola</h1>
   <p>Wedding FAQ — Everything you need to know</p>
 </header>
@@ -181,7 +191,6 @@
   accordions.forEach((accordion) => {
     accordion.addEventListener("click", function () {
 
-      // Close all other accordions
       accordions.forEach((other) => {
         if (other !== this && other.classList.contains("active")) {
           other.classList.remove("active");
@@ -189,7 +198,6 @@
         }
       });
 
-      // Toggle current
       this.classList.toggle("active");
       const panel = this.nextElementSibling;
 
