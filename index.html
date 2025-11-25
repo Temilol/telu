@@ -26,8 +26,14 @@
 
     header {
       text-align: center;
-      padding: 40px 20px 30px;
+      padding: 30px 20px 25px;
       background: var(--color-secondary);
+    }
+
+    .logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 10px;
     }
 
     header h1 {
@@ -43,6 +49,47 @@
       color: var(--color-text);
     }
 
+    /* Countdown Section */
+    .countdown-wrapper {
+      text-align: center;
+      margin: 40px 20px;
+    }
+
+    .countdown-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--color-primary);
+      margin-bottom: 15px;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .count-box {
+      background: white;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
+      min-width: 90px;
+    }
+
+    .count-number {
+      font-size: 2rem;
+      font-family: 'Playfair Display', serif;
+      color: var(--color-primary);
+      margin: 0;
+    }
+
+    .count-label {
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+
+    /* Navigation Cards */
     .container {
       max-width: 700px;
       margin: 50px auto;
@@ -68,7 +115,6 @@
       font-family: 'Playfair Display', serif;
       margin-bottom: 15px;
       font-size: 1.8rem;
-      color: var(--color-text);
     }
 
     .nav-card p {
@@ -106,11 +152,8 @@
       header h1 {
         font-size: 2.2rem;
       }
-      header p {
-        font-size: 1rem;
-      }
-      .nav-card {
-        padding: 25px 20px;
+      .count-box {
+        min-width: 70px;
       }
     }
   </style>
@@ -119,21 +162,47 @@
 <body>
 
 <header>
+  <!-- Replace logo.png with your actual logo asset -->
+  <img src="logo.png" alt="Wedding Logo" class="logo" />
   <h1>Toluwani & Temilola</h1>
-  <p>Welcome, dear guests — explore everything you need for our wedding weekend</p>
+  <p>Welcome, dear guests — we can’t wait to celebrate with you</p>
 </header>
+
+<!-- Countdown Section -->
+<section class="countdown-wrapper">
+  <h2 class="countdown-title">Countdown to Our Wedding Day</h2>
+
+  <div class="countdown" id="countdown">
+    <div class="count-box">
+      <p class="count-number" id="days">--</p>
+      <p class="count-label">Days</p>
+    </div>
+    <div class="count-box">
+      <p class="count-number" id="hours">--</p>
+      <p class="count-label">Hours</p>
+    </div>
+    <div class="count-box">
+      <p class="count-number" id="minutes">--</p>
+      <p class="count-label">Minutes</p>
+    </div>
+    <div class="count-box">
+      <p class="count-number" id="seconds">--</p>
+      <p class="count-label">Seconds</p>
+    </div>
+  </div>
+</section>
 
 <section class="container">
 
   <div class="nav-card">
     <h2>Wedding FAQ</h2>
-    <p>Find answers to common questions about the wedding day — timing, dress code, parking, photography, and more.</p>
+    <p>Everything you need to know about the big day — timing, dress code, parking, and more.</p>
     <a href="faq.html" class="btn">View FAQ</a>
   </div>
 
   <div class="nav-card">
     <h2>Things To Do in Town</h2>
-    <p>Explore our favorite places to eat, visit, relax, and enjoy while you're here for the celebration.</p>
+    <p>Explore our favorite spots to eat, visit, relax, and enjoy while you're here for the festivities.</p>
     <a href="guide.html" class="btn">Explore Guide</a>
   </div>
 
@@ -142,6 +211,33 @@
 <footer>
   With love, Toluwani & Temilola 💕
 </footer>
+
+<script>
+  const weddingDate = new Date("2026-05-28T18:00:00");
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = weddingDate - now;
+
+    if (diff <= 0) {
+      document.getElementById("countdown").innerHTML = "<p style='font-size:1.4rem;'>It's our wedding day! 💕</p>";
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById("days").textContent = days;
+    document.getElementById("hours").textContent = hours;
+    document.getElementById("minutes").textContent = minutes;
+    document.getElementById("seconds").textContent = seconds;
+  }
+
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+</script>
 
 </body>
 </html>
