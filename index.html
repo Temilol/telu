@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Toluwani & Temilola — Wedding Info</title>
 
-  <link rel="icon" type="image/png" href="logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
@@ -26,14 +25,8 @@
 
     header {
       text-align: center;
-      padding: 30px 20px 25px;
+      padding: 40px 20px 25px;
       background: var(--color-secondary);
-    }
-
-    .logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 10px;
     }
 
     header h1 {
@@ -148,12 +141,47 @@
       font-size: 0.9rem;
     }
 
-    @media (max-width: 500px) {
-      header h1 {
-        font-size: 2.2rem;
+    /* Floating Music Toggle Button — Elegant Version */
+    .music-floating-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      color: var(--color-primary);
+      border: 3px solid var(--color-primary);
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 999;
+    }
+
+    .music-floating-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+    }
+
+    .music-floating-btn.playing {
+      animation: pulseGlow 2.3s infinite ease-in-out;
+      border-color: #d8a17a;
+      color: #c48762;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
       }
-      .count-box {
-        min-width: 70px;
+      50% {
+        box-shadow: 0 0 18px rgba(198, 138, 101, 0.55);
+      }
+      100% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
       }
     }
   </style>
@@ -162,33 +190,27 @@
 <body>
 
 <header>
-  <!-- Replace logo.png with your actual logo asset -->
-  <img src="logo.png" alt="Wedding Logo" class="logo" />
   <h1>Toluwani & Temilola</h1>
   <p>Welcome, dear guests — we can’t wait to celebrate with you</p>
 </header>
 
-<!-- Countdown Section -->
+<!-- Floating Music Button -->
+<div class="music-floating-btn" id="musicToggle" data-playing="false">🎵</div>
+
+<!-- Background Music -->
+<audio id="bgMusic" loop muted>
+  <source src="music.mp3" type="audio/mp3">
+</audio>
+
+<!-- Countdown -->
 <section class="countdown-wrapper">
   <h2 class="countdown-title">Countdown to Our Wedding Day</h2>
 
   <div class="countdown" id="countdown">
-    <div class="count-box">
-      <p class="count-number" id="days">--</p>
-      <p class="count-label">Days</p>
-    </div>
-    <div class="count-box">
-      <p class="count-number" id="hours">--</p>
-      <p class="count-label">Hours</p>
-    </div>
-    <div class="count-box">
-      <p class="count-number" id="minutes">--</p>
-      <p class="count-label">Minutes</p>
-    </div>
-    <div class="count-box">
-      <p class="count-number" id="seconds">--</p>
-      <p class="count-label">Seconds</p>
-    </div>
+    <div class="count-box"><p class="count-number" id="days">--</p><p class="count-label">Days</p></div>
+    <div class="count-box"><p class="count-number" id="hours">--</p><p class="count-label">Hours</p></div>
+    <div class="count-box"><p class="count-number" id="minutes">--</p><p class="count-label">Minutes</p></div>
+    <div class="count-box"><p class="count-number" id="seconds">--</p><p class="count-label">Seconds</p></div>
   </div>
 </section>
 
@@ -213,26 +235,76 @@
 </footer>
 
 <script>
-  const weddingDate = new Date("2026-05-28T18:00:00");
+  const music = document.getElementById("bgMusic");
+  const toggleBtn = document.getElementById("musicToggle");
+  let isPlaying = false;
 
+  function fadeToVolume(target, duration = 2000) {
+    const start = music.volume;
+    const step = (target - start) / (duration / 50);
+
+    const fade = setInterval(() => {
+      let v = music.volume + step;
+      if ((step > 0 && v >= target) || (step < 0 && v <= target)) {
+        music.volume = target;
+        clearInterval(fade);
+      } else {
+        music.volume = v;
+      }
+    }, 50);
+  }
+
+  // Autoplay attempt on load
+  window.addEventListener("load", () => {
+    music.play().then(() => {
+      music.muted = false;
+      fadeToVolume(0.15);
+      isPlaying = true;
+
+      toggleBtn.classList.add("playing");
+      toggleBtn.textContent = "🔇";
+    }).catch(() => {
+      toggleBtn.textContent = "🎵"; // Autoplay blocked until click
+    });
+  });
+
+  // Toggle playback
+  toggleBtn.addEventListener("click", () => {
+    if (!isPlaying) {
+      music.play();
+      music.muted = false;
+      fadeToVolume(0.15);
+      isPlaying = true;
+
+      toggleBtn.classList.add("playing");
+      toggleBtn.textContent = "🔇";
+    } else {
+      fadeToVolume(0, 500);
+      setTimeout(() => music.pause(), 500);
+
+      isPlaying = false;
+
+      toggleBtn.classList.remove("playing");
+      toggleBtn.textContent = "🎵";
+    }
+  });
+
+  // Countdown
+  const weddingDate = new Date("2025-08-15T16:00:00");
   function updateCountdown() {
     const now = new Date();
     const diff = weddingDate - now;
 
     if (diff <= 0) {
-      document.getElementById("countdown").innerHTML = "<p style='font-size:1.4rem;'>It's our wedding day! 💕</p>";
+      document.getElementById("countdown").innerHTML =
+        "<p style='font-size:1.4rem;'>It's our wedding day! 💕</p>";
       return;
     }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-
-    document.getElementById("days").textContent = days;
-    document.getElementById("hours").textContent = hours;
-    document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds;
+    document.getElementById("days").textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
+    document.getElementById("hours").textContent = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    document.getElementById("minutes").textContent = Math.floor((diff / (1000 * 60)) % 60);
+    document.getElementById("seconds").textContent = Math.floor((diff / 1000) % 60);
   }
 
   setInterval(updateCountdown, 1000);
