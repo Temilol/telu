@@ -147,12 +147,140 @@
       line-height: 1.6;
     }
 
+    .card ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+    }
+
+    .card ul li {
+      padding: 8px 0;
+      line-height: 1.6;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .card ul li:before {
+      content: '•';
+      color: var(--color-primary);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
     footer {
       text-align: center;
       padding: 40px;
       color: var(--color-text);
       font-size: 0.9rem;
       background: var(--color-secondary);
+    }
+
+    /* Tooltip Styles */
+    .tooltip-trigger {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--color-primary);
+      color: white;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+    }
+
+    .tooltip-trigger:hover {
+      background: #a3785f;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .tooltip-content {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 30px;
+      max-width: 450px;
+      padding: 1.5rem;
+      background: var(--card-bg);
+      border: 2px solid var(--color-primary);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.3s ease;
+      z-index: 999;
+    }
+
+    .tooltip-content.active {
+      display: block;
+    }
+
+    .tooltip-content h3 {
+      margin-top: 0;
+      color: var(--color-primary);
+      font-size: 1.3rem;
+    }
+
+    .tooltip-content p {
+      margin: 0.8rem 0;
+      line-height: 1.7;
+    }
+
+    .tooltip-content ul {
+      margin: 0.5rem 0 1rem 0;
+      line-height: 1.8;
+      list-style: none;
+      padding: 0;
+    }
+
+    .tooltip-content ul li {
+      padding: 8px 0;
+      line-height: 1.8;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .tooltip-content ul li:before {
+      content: '•';
+      color: var(--color-primary);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tooltip-trigger {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+      }
+
+      .tooltip-content {
+        bottom: 80px;
+        right: 20px;
+        left: 20px;
+        max-width: none;
+      }
     }
 
     @media (max-width: 480px) {
@@ -170,7 +298,7 @@
 
 <header>
   <h1>Toluwani & Temilola</h1>
-  <p>Things To Do in Town — Places to Explore During the Wedding Weekend</p>
+  <p>Things To Do in Dallas & McKinney — Places to Explore During the Wedding Weekend</p>
 </header>
 
 <nav class="breadcrumb">
@@ -178,65 +306,119 @@
 </nav>
 
 <section class="section-wrapper">
+  
+  <div class="tooltip-content" id="venueInfo">
+    <h3>📍 About These Recommendations</h3>
+    <p>Our wedding celebrations will take place at <strong>two beautiful venues</strong>:</p>
+    <ul>
+      <li><strong>The Crown</strong> – 2610 Elm St, Dallas, TX 75226 (Downtown Dallas / Deep Ellum)</li>
+      <li><strong>D'Vine Grace Vineyard</strong> – 3000 Coit Rd, Prosper, TX 75078 (McKinney area)</li>
+    </ul>
+    <p>We've organized recommendations below based on proximity to each venue, so you can easily explore the area near where you're staying or between events. Enjoy Dallas!</p>
+  </div>
 
-  <h2 class="category-title">🌆 Local Attractions</h2>
+  <h2 class="category-title">⭐ Local Attractions</h2>
 
   <div class="card">
-    <h3>[Attraction Name]</h3>
-    <p>[Short description of what guests can expect — scenic views, family-friendly, historical landmark, etc.]</p>
+    <h3>Near The Crown (Downtown Dallas)</h3>
+    <ul>
+      <li><strong>The Dallas Museum of Art (DMA)</strong> – Free general admission and perfect for an afternoon stroll.</li>
+      <li><strong>Klyde Warren Park</strong> – A lively urban park with food trucks, live events, and plenty of sunshine.</li>
+      <li><strong>The Sixth Floor Museum at Dealey Plaza</strong> – Historic landmark and well-curated exhibition.</li>
+      <li><strong>Reunion Tower "The Ball"</strong> – 360° views of Dallas; great for sunset photos.</li>
+    </ul>
   </div>
 
   <div class="card">
-    <h3>[Another Attraction]</h3>
-    <p>[Write a short blurb on why this is worth visiting.]</p>
+    <h3>Near D'Vine Grace Vineyard (McKinney/Prosper)</h3>
+    <ul>
+      <li><strong>Historic Downtown McKinney</strong> – Boutique shops, cute cafés, antiques, and Instagram-worthy streets.</li>
+      <li><strong>Heard Natural Science Museum & Wildlife Sanctuary</strong> – Exhibit hall + outdoor trails.</li>
+      <li><strong>Adriatica Village</strong> – A picturesque European-style village, perfect for photos and a relaxing walk.</li>
+    </ul>
   </div>
 
-  <h2 class="category-title">🍽 Great Places to Eat</h2>
+  <h2 class="category-title">🍽️ Places to Eat</h2>
 
   <div class="card">
-    <h3>[Restaurant Name]</h3>
-    <p>[Cuisine type, popular dishes, price range, whether reservations are recommended.]</p>
-  </div>
-
-  <div class="card">
-    <h3>[Brunch / Café Spot]</h3>
-    <p>[Good for coffee, pastries, or casual meals.]</p>
-  </div>
-
-  <h2 class="category-title">🛍 Shopping & Markets</h2>
-
-  <div class="card">
-    <h3>[Mall / Shopping District]</h3>
-    <p>[High-end stores, local boutiques, or open-air markets — add details.]</p>
+    <h3>Near The Crown (Downtown Dallas)</h3>
+    <ul>
+      <li><strong>The Woolworth</strong> – Upscale cocktails + great small plates. <em>Reservations recommended.</em></li>
+      <li><strong>Overeasy</strong> – Chic brunch spot inside The Statler. <em>Great for brunch!</em></li>
+      <li><strong>Pecan Lodge (Deep Ellum)</strong> – One of the best BBQ spots in Dallas. <em>Pro tip: Arrive early or expect a line!</em></li>
+      <li><strong>Moxies & Yardbird (Uptown)</strong> – Trendy, reliable, and perfect for groups.</li>
+    </ul>
   </div>
 
   <div class="card">
-    <h3>[Local Artisan Market]</h3>
-    <p>[Perfect for souvenirs, handmade goods, or gifts.]</p>
+    <h3>Near D'Vine Grace Vineyard (McKinney/Prosper)</h3>
+    <ul>
+      <li><strong>Harvest Seasonal Kitchen</strong> – Farm-to-table, elegant, highly rated. <em>Reservations recommended.</em></li>
+      <li><strong>Hutchins BBQ</strong> – A favorite North Dallas BBQ spot. <em>Great for lunch!</em></li>
+      <li><strong>Sugarbacon Proper Kitchen</strong> – Modern American comfort dishes.</li>
+      <li><strong>Blue Goose Cantina</strong> – Casual Tex-Mex fun vibe.</li>
+    </ul>
   </div>
 
-  <h2 class="category-title">🌿 Outdoor & Nature</h2>
+  <h2 class="category-title">🛍️ Shopping</h2>
 
   <div class="card">
-    <h3>[Park or Scenic Spot]</h3>
-    <p>[Walking trails, picnic areas, lake views — describe what makes it special.]</p>
-  </div>
-
-  <div class="card">
-    <h3>[Beach / Botanical Garden / Waterfront]</h3>
-    <p>[A peaceful place to unwind or take photos during downtime.]</p>
-  </div>
-
-  <h2 class="category-title">🎉 Nightlife & Entertainment</h2>
-
-  <div class="card">
-    <h3>[Lounge or Bar]</h3>
-    <p>[Good for cocktails, live music, or dancing.]</p>
+    <h3>Near The Crown (Downtown Dallas)</h3>
+    <ul>
+      <li><strong>NorthPark Center</strong> – High-end mall with luxury stores, art installations, and great dining. <em>~15 min drive from downtown.</em></li>
+      <li><strong>West Village (Uptown)</strong> – Outdoor shopping + cafés + boutiques. <em>Very walkable area!</em></li>
+      <li><strong>Neiman Marcus Downtown Flagship</strong> – Iconic Dallas department store. <em>A Dallas landmark!</em></li>
+    </ul>
   </div>
 
   <div class="card">
-    <h3>[Theatre / Comedy Club / Live Event]</h3>
-    <p>[Something fun for guests who are staying multiple days.]</p>
+    <h3>Near D'Vine Grace Vineyard (McKinney/Prosper)</h3>
+    <ul>
+      <li><strong>The Shops at Legacy / Legacy West</strong> – Luxury shopping, dining, and beautiful outdoor areas. <em>Great for evening strolls!</em></li>
+      <li><strong>Allen Premium Outlets</strong> – Great for discounted designer shopping. <em>Best deals on weekdays.</em></li>
+      <li><strong>Downtown McKinney Boutiques</strong> – Local artisan shops and curated finds. <em>Perfect for unique souvenirs!</em></li>
+    </ul>
+  </div>
+
+  <h2 class="category-title">🌿 Outdoor / Nature</h2>
+
+  <div class="card">
+    <h3>Near The Crown (Downtown Dallas)</h3>
+    <ul>
+      <li><strong>Dallas Arboretum & Botanical Garden</strong> – Stunning gardens overlooking White Rock Lake. <em>Admission fee; check hours online.</em></li>
+      <li><strong>Trinity Groves & Margaret Hunt Hill Bridge</strong> – Scenic views + casual dining. <em>Great photo spot!</em></li>
+      <li><strong>White Rock Lake</strong> – Ideal for morning walks or sunset views. <em>9-mile trail, bike rentals nearby.</em></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Near D'Vine Grace Vineyard (McKinney/Prosper)</h3>
+    <ul>
+      <li><strong>Erwin Park</strong> – Walking, biking, and quiet green spaces. <em>Family-friendly trails.</em></li>
+      <li><strong>Heard Wildlife Sanctuary Trails</strong> – Easy, peaceful nature walks. <em>Great for birdwatching!</em></li>
+      <li><strong>Bonnie Wenk Park</strong> – Great outdoor space for families and groups. <em>Playgrounds and picnic areas.</em></li>
+    </ul>
+  </div>
+
+  <h2 class="category-title">🌙 Nightlife / Entertainment</h2>
+
+  <div class="card">
+    <h3>Near The Crown (Downtown Dallas)</h3>
+    <ul>
+      <li><strong>Deep Ellum</strong> – Live music, rooftop bars, murals, and nightlife energy. <em>Walking distance from The Crown!</em></li>
+      <li><strong>Uptown Dallas</strong> – Classy lounges, bars, and walkable nightlife (e.g., Clutch, Kung Fu, Bowen House). <em>Dress code enforced at some venues.</em></li>
+      <li><strong>The Statler or Thompson Roof Bars</strong> – Upscale cocktails + skyline views. <em>Great for sunset drinks!</em></li>
+      <li><strong>House of Blues</strong> – Concerts and brunch events. <em>Check event calendar online.</em></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Near D'Vine Grace Vineyard (McKinney/Prosper)</h3>
+    <ul>
+      <li><strong>The Comedy Arena (Downtown McKinney)</strong> – Family-friendly improv shows. <em>Great for a fun night out!</em></li>
+      <li><strong>The Yard / Tupps Brewery</strong> – Chill local brewery vibes. <em>Outdoor seating available.</em></li>
+      <li><strong>Lounge at Legacy West</strong> – Nightlife energy without going downtown. <em>Multiple venues in one area.</em></li>
+    </ul>
   </div>
 
 </section>
@@ -244,6 +426,15 @@
 <footer>
   Made with love for our guests — Toluwani & Temilola 💕
 </footer>
+
+<div class="tooltip-trigger" onclick="toggleTooltip()">📍</div>
+
+<script>
+  function toggleTooltip() {
+    const tooltip = document.getElementById('venueInfo');
+    tooltip.classList.toggle('active');
+  }
+</script>
 
 </body>
 </html>
