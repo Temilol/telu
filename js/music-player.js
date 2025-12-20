@@ -18,18 +18,29 @@ function fadeToVolume(target, duration = 2000) {
   }, 50);
 }
 
-// Save music state before leaving page
-window.addEventListener("beforeunload", () => {
+// Save current state to localStorage
+function saveState() {
   if (isPlaying) {
     localStorage.setItem("musicPlaying", "true");
     localStorage.setItem("musicTime", music.currentTime);
   } else {
     localStorage.setItem("musicPlaying", "false");
   }
-});
+}
+
+// Save state periodically while playing
+setInterval(() => {
+  if (isPlaying) {
+    localStorage.setItem("musicTime", music.currentTime);
+  }
+}, 1000);
+
+// Save music state before leaving page
+window.addEventListener("beforeunload", saveState);
+window.addEventListener("pagehide", saveState);
 
 // Restore music state on load
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const wasPlaying = localStorage.getItem("musicPlaying") === "true";
   const savedTime = parseFloat(localStorage.getItem("musicTime")) || 0;
 
@@ -54,6 +65,7 @@ window.addEventListener("load", () => {
         isPlaying = true;
         toggleBtn.classList.add("playing");
         toggleBtn.textContent = "🔇";
+        localStorage.setItem("musicPlaying", "true");
       }).catch(() => {
         toggleBtn.textContent = "🎵";
       });
