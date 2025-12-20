@@ -262,19 +262,19 @@
   <div class="nav-card">
     <h2>Travel & Accommodations</h2>
     <p>Find flight options, recommended hotels, and transportation tips to make your journey smooth and easy.</p>
-    <a href="travel/" class="btn">View Travel Info</a>
+    <a href="/travel" class="btn">View Travel Info</a>
   </div>
 
   <div class="nav-card">
     <h2>Things To Do in Town</h2>
     <p>Explore our favorite spots to eat, visit, relax, and enjoy while you're here for the festivities.</p>
-    <a href="guide/" class="btn">Explore Guide</a>
+    <a href="/guide" class="btn">Explore Guide</a>
   </div>
 
   <div class="nav-card">
     <h2>Wedding FAQ</h2>
     <p>Everything you need to know about the big day — timing, dress code, parking, and more.</p>
-    <a href="faq/" class="btn">View FAQ</a>
+    <a href="/faq" class="btn">View FAQ</a>
   </div>
 
 </section>
@@ -283,82 +283,8 @@
   With love, Toluwani & Temilola 💕
 </footer>
 
-<script>
-  const music = document.getElementById("bgMusic");
-  const toggleBtn = document.getElementById("musicToggle");
-  let isPlaying = false;
-
-  function fadeToVolume(target, duration = 2000) {
-    const start = music.volume;
-    const step = (target - start) / (duration / 50);
-
-    const fade = setInterval(() => {
-      let v = music.volume + step;
-      if ((step > 0 && v >= target) || (step < 0 && v <= target)) {
-        music.volume = target;
-        clearInterval(fade);
-      } else {
-        music.volume = v;
-      }
-    }, 50);
-  }
-
-  // Autoplay attempt on load
-  window.addEventListener("load", () => {
-    music.play().then(() => {
-      music.muted = false;
-      fadeToVolume(0.15);
-      isPlaying = true;
-
-      toggleBtn.classList.add("playing");
-      toggleBtn.textContent = "🔇";
-    }).catch(() => {
-      toggleBtn.textContent = "🎵"; // Autoplay blocked until click
-    });
-  });
-
-  // Toggle playback
-  toggleBtn.addEventListener("click", () => {
-    if (!isPlaying) {
-      music.play();
-      music.muted = false;
-      fadeToVolume(0.15);
-      isPlaying = true;
-
-      toggleBtn.classList.add("playing");
-      toggleBtn.textContent = "🔇";
-    } else {
-      fadeToVolume(0, 500);
-      setTimeout(() => music.pause(), 500);
-
-      isPlaying = false;
-
-      toggleBtn.classList.remove("playing");
-      toggleBtn.textContent = "🎵";
-    }
-  });
-
-  // Countdown
-  const weddingDate = new Date("2026-05-30T00:00:00");
-  function updateCountdown() {
-    const now = new Date();
-    const diff = weddingDate - now;
-
-    if (diff <= 0) {
-      document.getElementById("countdown").innerHTML =
-        "<p style='font-size:1.4rem;'>It's our wedding day! 💕</p>";
-      return;
-    }
-
-    document.getElementById("days").textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
-    document.getElementById("hours").textContent = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    document.getElementById("minutes").textContent = Math.floor((diff / (1000 * 60)) % 60);
-    document.getElementById("seconds").textContent = Math.floor((diff / 1000) % 60);
-  }
-
-  setInterval(updateCountdown, 1000);
-  updateCountdown();
-</script>
+<script src="js/music-player.js"></script>
+<script src="js/countdown.js"></script>
 
 </body>
 </html>

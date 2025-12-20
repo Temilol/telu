@@ -180,10 +180,55 @@
       background: var(--color-secondary);
     }
 
+    /* Floating Music Toggle Button */
+    .music-floating-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: white;
+      color: var(--color-primary);
+      border: 2px solid var(--color-primary);
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
+      z-index: 1001;
+    }
+
+    .music-floating-btn:hover {
+      background: var(--color-secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .music-floating-btn.playing {
+      animation: pulseGlow 2.3s infinite ease-in-out;
+      border-color: #d8a17a;
+      color: #c48762;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(198, 138, 101, 0.55);
+      }
+      100% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+    }
+
     /* Tooltip Styles */
     .tooltip-trigger {
       position: fixed;
-      bottom: 30px;
+      bottom: 90px;
       right: 30px;
       background: white;
       color: var(--color-primary);
@@ -211,7 +256,7 @@
     .tooltip-content {
       display: none;
       position: fixed;
-      bottom: 90px;
+      bottom: 150px;
       right: 30px;
       max-width: 450px;
       padding: 1.5rem;
@@ -272,7 +317,7 @@
     }
 
     @media (max-width: 768px) {
-      .tooltip-trigger {
+      .music-floating-btn {
         bottom: 20px;
         right: 20px;
         width: 50px;
@@ -280,8 +325,16 @@
         font-size: 1.3rem;
       }
 
-      .tooltip-content {
+      .tooltip-trigger {
         bottom: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+      }
+
+      .tooltip-content {
+        bottom: 140px;
         right: 20px;
         left: 20px;
         max-width: none;
@@ -434,28 +487,16 @@
 
 <div class="tooltip-trigger" onclick="toggleTooltip(event)">📍</div>
 
-<script>
-  function toggleTooltip(event) {
-    event.stopPropagation();
-    const tooltip = document.getElementById('venueInfo');
-    tooltip.classList.toggle('active');
-  }
+<!-- Floating Music Button -->
+<div class="music-floating-btn" id="musicToggle" data-playing="false">🎵</div>
 
-  // Close tooltip when clicking outside
-  document.addEventListener('click', function(event) {
-    const tooltip = document.getElementById('venueInfo');
-    const trigger = document.querySelector('.tooltip-trigger');
-    
-    if (!tooltip.contains(event.target) && !trigger.contains(event.target)) {
-      tooltip.classList.remove('active');
-    }
-  });
+<!-- Background Music -->
+<audio id="bgMusic" loop muted>
+  <source src="../music.mp3" type="audio/mp3">
+</audio>
 
-  // Prevent clicks inside tooltip from closing it
-  document.getElementById('venueInfo').addEventListener('click', function(event) {
-    event.stopPropagation();
-  });
-</script>
+<script src="../js/music-player.js"></script>
+<script src="../js/tooltip.js"></script>
 
 </body>
 </html>

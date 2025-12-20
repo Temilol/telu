@@ -222,6 +222,50 @@
       background: var(--color-secondary);
     }
 
+    /* Floating Music Toggle Button */
+    .music-floating-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      color: var(--color-primary);
+      border: 3px solid var(--color-primary);
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 999;
+    }
+
+    .music-floating-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+    }
+
+    .music-floating-btn.playing {
+      animation: pulseGlow 2.3s infinite ease-in-out;
+      border-color: #d8a17a;
+      color: #c48762;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(198, 138, 101, 0.55);
+      }
+      100% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+    }
+
     @media (max-width: 480px) {
       header h1 {
         font-size: 2.2rem;
@@ -241,7 +285,7 @@
 </header>
 
 <nav class="breadcrumb">
-  <a href="../">Home</a> <span>/</span> <span>Travel & Accommodations</span>
+  <a href="/">Home</a> <span>/</span> <span>Travel & Accommodations</span>
 </nav>
 
 <section class="section-wrapper">
@@ -341,7 +385,7 @@
 
   <div class="info-box">
     <p><strong>Book Early:</strong> The days surrounding our wedding coincide with Memorial Day weekend and several graduations in the DFW area. We highly recommend booking your travel accommodations early to secure the best rates.</p>
-    <p><strong>Local Attractions:</strong> If you have some extra time during your visit, consider exploring our <a href="../guide/" style="color: var(--color-primary); text-decoration: underline;">Things to Do guide</a></p>
+    <p><strong>Local Attractions:</strong> If you have some extra time during your visit, consider exploring our <a href="/guide" style="color: var(--color-primary); text-decoration: underline;">Things to Do guide</a></p>
     <p><strong>Weather:</strong> Late May typically brings warm weather in Dallas. Pack accordingly!</p>
     <p><strong>Time Zone:</strong> Central Time Zone(CT)</p>
   </div>
@@ -352,6 +396,16 @@
   Safe travels — we can't wait to see you!<br>
   Toluwani & Temilola 💕
 </footer>
+
+<!-- Floating Music Button -->
+<div class="music-floating-btn" id="musicToggle" data-playing="false">🎵</div>
+
+<!-- Background Music -->
+<audio id="bgMusic" loop muted>
+  <source src="../music.mp3" type="audio/mp3">
+</audio>
+
+<script src="../js/music-player.js"></script>
 
 </body>
 </html>
