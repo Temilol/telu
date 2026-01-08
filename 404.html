@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Page Not Found — Toluwani & Temilola</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    html {
+      overscroll-behavior-y: none;
+    }
+
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Side Images */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-image: url('image.jpg');
+      background-size: cover;
+      background-position: 38% center;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+    }
+
+    body::after {
+      right: 0;
+    }
+
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 150px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 20px 25px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: var(--color-text);
+    }
+
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .error-container {
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .error-code {
+      margin: 0 0 -50px 0;
+    }
+
+    .error-logo {
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+    }
+
+    .error-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--color-text);
+      margin: 20px 0;
+    }
+
+    .error-message {
+      font-size: 1.1rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 6px;
+      font-size: 1rem;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+
+    .btn:hover {
+      background: #b57753;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: var(--color-text);
+      font-size: 0.9rem;
+      background: var(--color-secondary);
+    }
+
+    /* Floating Music Toggle Button */
+    .music-floating-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      color: var(--color-primary);
+      border: 3px solid var(--color-primary);
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 999;
+    }
+
+    .music-floating-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+    }
+
+    .music-floating-btn.playing {
+      animation: pulseGlow 2.3s infinite ease-in-out;
+      border-color: #d8a17a;
+      color: #c48762;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(198, 138, 101, 0.55);
+      }
+      100% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .error-logo {
+        width: 100px;
+        height: 100px;
+      }
+      .error-title {
+        font-size: 1.5rem;
+      }
+      .error-message {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Toluwani & Temilola</h1>
+  <p>Oops! Page Not Found</p>
+</header>
+
+<div class="content-wrapper">
+  <div class="error-container">
+    <div class="error-code">
+      <img src="logo.png" alt="Toluwani & Temilola" class="error-logo">
+    </div>
+    <h3 class="error-title">This page seems to have wandered off...</h3>
+    <p class="error-message">
+      We couldn't find the page you're looking for. It may have been moved or doesn't exist yet. 
+      Let's get you back to where the celebration is!
+    </p>
+    <a href="/" class="btn">Return to Home</a>
+  </div>
+</div>
+
+<footer>
+  Toluwani & Temilola 💕
+</footer>
+
+<script src="js/music-player.js"></script>
+
+</body>
+</html>
