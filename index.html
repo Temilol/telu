@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Toluwani & Temilola — Wedding Info</title>
+  <title>Toluwani & Temilola — Travel & Accommodations</title>
 
-  <link rel="icon" type="image/png" href="logo.png" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../logo.png" />
+
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
@@ -18,14 +20,15 @@
       --color-secondary: #E9D6CF;
       --color-text: #3B2F2F;
       --color-bg: #F8F4F1;
-      --shadow: rgba(0, 0, 0, 0.08);
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
     }
 
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: var(--color-bg);
       color: var(--color-text);
+      background-color: var(--color-bg);
       position: relative;
     }
 
@@ -37,7 +40,7 @@
       top: 0;
       width: 200px;
       height: 100vh;
-      background-image: url('image.jpg');
+      background-image: url('../image.jpg');
       background-size: cover;
       background-position: 38% center;
       opacity: 0.8;
@@ -68,95 +71,129 @@
 
     header {
       text-align: center;
-      padding: 40px 20px 25px;
+      padding: 20px 20px 25px;
       background: var(--color-secondary);
     }
 
     header h1 {
       font-family: 'Playfair Display', serif;
-      margin: 0;
       font-size: 3rem;
+      margin: 0;
       color: var(--color-primary);
     }
 
     header p {
-      margin-top: 10px;
       font-size: 1.2rem;
+      margin-top: 10px;
       color: var(--color-text);
     }
 
-    /* Countdown Section */
-    .countdown-wrapper {
-      text-align: center;
-      margin: 40px 20px;
-    }
-
-    .countdown-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      color: var(--color-primary);
-      margin-bottom: 15px;
-    }
-
-    .countdown {
-      display: flex;
-      justify-content: center;
-      gap: 25px;
-      flex-wrap: wrap;
-    }
-
-    .count-box {
-      background: white;
-      padding: 20px 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px var(--shadow);
-      min-width: 90px;
-    }
-
-    .count-number {
-      font-size: 2rem;
-      font-family: 'Playfair Display', serif;
-      color: var(--color-primary);
-      margin: 0;
-    }
-
-    .count-label {
+    .breadcrumb {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 0 20px;
       font-size: 0.9rem;
-      margin-top: 5px;
+      color: #666;
     }
 
-    /* Navigation Cards */
-    .container {
-      max-width: 700px;
-      margin: 50px auto;
-      text-align: center;
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #b57753;
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      margin: 0 8px;
+    }
+
+    .section-wrapper {
+      max-width: 900px;
+      margin: 40px auto;
       padding: 0 20px;
     }
 
-    .nav-card {
-      background: white;
+    .category-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: var(--color-primary);
+      text-align: center;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
       border-radius: 16px;
-      padding: 35px 25px;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 14px var(--shadow);
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 25px;
       transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .nav-card:hover {
+    .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
 
-    .nav-card h2 {
+    .card h3 {
+      font-size: 1.3rem;
+      margin-top: 0;
+      margin-bottom: 12px;
       font-family: 'Playfair Display', serif;
-      margin-bottom: 15px;
-      font-size: 1.8rem;
+      color: var(--color-primary);
+      font-weight: 600;
     }
 
-    .nav-card p {
-      margin-bottom: 25px;
-      font-size: 1rem;
+    .card p {
+      margin: 8px 0;
       line-height: 1.6;
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .card strong {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .hotel-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .hotel-card .card-info {
+      flex: 1;
+    }
+
+    .hotel-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .hotel-card p {
+      margin: 0;
+    }
+
+    .hotel-card .btn {
+      flex-shrink: 0;
+    }
+
+    .info-box {
+      background: #fcf9f6;
+      border-left: 4px solid var(--color-primary);
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 8px;
+    }
+
+    .info-box p {
+      margin: 8px 0;
+      line-height: 1.7;
     }
 
     .btn {
@@ -164,27 +201,28 @@
       padding: 12px 28px;
       background: var(--color-primary);
       color: #fff;
-      border-radius: 30px;
-      font-size: 1.1rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
       text-decoration: none;
-      font-weight: 500;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
       transition: background 0.25s ease, box-shadow 0.25s ease;
     }
 
     .btn:hover {
       background: #b57753;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 
     footer {
       text-align: center;
-      padding: 40px 20px;
-      background: var(--color-secondary);
+      padding: 40px;
+      color: var(--color-text);
       font-size: 0.9rem;
+      background: var(--color-secondary);
     }
 
-    /* Floating Music Toggle Button — Elegant Version */
+    /* Floating Music Toggle Button */
     .music-floating-btn {
       position: fixed;
       bottom: 25px;
@@ -227,6 +265,54 @@
         box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
       }
     }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+    }
+
+    /* Tooltip */
+    .tooltip-container {
+      position: relative;
+      display: inline;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--color-text);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 1000;
+    }
+
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--color-text);
+    }
+
+    .tooltip.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-12px);
+    }
   </style>
 </head>
 
@@ -234,49 +320,146 @@
 
 <header>
   <h1>Toluwani & Temilola</h1>
-  <p>Welcome, dear guests — we can’t wait to celebrate with you</p>
+  <p>Travel & Accommodations — Flight and Hotel Recommendations</p>
 </header>
 
-<!-- Countdown -->
-<section class="countdown-wrapper">
-  <h2 class="countdown-title">Countdown to Our Wedding Day</h2>
+<section class="section-wrapper">
 
-  <div class="countdown" id="countdown">
-    <div class="count-box"><p class="count-number" id="days">--</p><p class="count-label">Days</p></div>
-    <div class="count-box"><p class="count-number" id="hours">--</p><p class="count-label">Hours</p></div>
-    <div class="count-box"><p class="count-number" id="minutes">--</p><p class="count-label">Minutes</p></div>
-    <div class="count-box"><p class="count-number" id="seconds">--</p><p class="count-label">Seconds</p></div>
-  </div>
-</section>
-
-<section class="container">
-
-  <div class="nav-card">
-    <h2>Travel & Accommodations</h2>
-    <p>Find flight options, recommended hotels, and transportation tips to make your journey smooth and easy.</p>
-    <a href="/travel" class="btn">View Travel Info</a>
+  <div class="info-box">
+    <p><strong>Wedding Location:</strong> Dallas, Texas</p>
+    <p>We are so excited to celebrate with you! Below are some travel and accommodation recommendations to help you plan your trip.</p>
   </div>
 
-  <div class="nav-card">
-    <h2>Things To Do in Town</h2>
-    <p>Explore our favorite spots to eat, visit, relax, and enjoy while you're here for the festivities.</p>
-    <a href="/guide" class="btn">Explore Guide</a>
+  <h2 class="category-title">✈️ Getting Here by Air</h2>
+
+  <div class="card">
+    <h3>Nearest Airport</h3>
+    <p><strong>Dallas/Fort Worth International Airport (DFW)</strong></p>
+    <p>This is the airport we recommend flying into. Most major airlines operate daily flights here.</p>
   </div>
 
-  <div class="nav-card">
-    <h2>Wedding FAQ</h2>
-    <p>Everything you need to know about the big day — timing, dress code, parking, and more.</p>
-    <a href="/faq" class="btn">View FAQ</a>
+  <div class="card">
+    <h3>Airport Transportation</h3>
+    <p><strong>Rental Cars:</strong> Available at all major airports through companies like Enterprise, Hertz, and Avis.</p>
+    <p><strong>Rideshare:</strong> Uber and Lyft operate in the area.</p>
+    <p><strong>Shuttle Service:</strong> Depending on the hotel, shuttle services may be available. Please check with your accommodation for details.</p>
+  </div>
+
+  <h2 class="category-title">🏨 Recommended Hotels</h2>
+
+  <div class="card hotel-card">
+    <div class="card-info">
+      <h3>DoubleTree by Hilton Hotel Dallas - Farmers Branch</h3>
+      <p><strong>Location:</strong> 11611 Luna Road, Farmers Branch, TX 75234</p>
+      <p><strong>Phone:</strong> +1 (972) 506-0055</p>
+      <p><strong>Distance to Traditional Venue:</strong> ~40 miles (65 km) | <strong>Reception Venue:</strong> ~3 miles (5 km)</p>
+    </div>
+    <a href="https://www.tripadvisor.com/Hotel_Review-g55828-d483586-Reviews-Doubletree_By_Hilton_Hotel_Dallas_Farmers_Branch-Farmers_Branch_Texas.html" target="_blank" class="btn">View</a>
+  </div>
+
+  <div class="card hotel-card">
+    <div class="card-info">
+      <h3>Renaissance Dallas North Hotel</h3>
+      <p><strong>Location:</strong> 1590 Lyndon B Johnson Freeway, Dallas, TX 75234</p>
+      <p><strong>Phone:</strong> +1 (800) 468-3571</p>
+      <p><strong>Distance to Traditional Venue:</strong> ~40 miles (65 km) | <strong>Reception Venue:</strong> ~3 miles (5 km)</p>
+    </div>
+    <a href="https://www.tripadvisor.com/Hotel_Review-g55711-d122715-Reviews-Renaissance_Dallas_North_Hotel-Dallas_Texas.html" target="_blank" class="btn">View</a>
+  </div>
+
+  <div class="card hotel-card">
+    <div class="card-info">
+      <h3>Sheraton McKinney Hotel</h3>
+      <p><strong>Location:</strong> 1900 Gateway Boulevard, McKinney, TX 75070</p>
+      <p><strong>Phone:</strong> +1 (972) 549-4000</p>
+      <p><strong>Distance to Traditional Venue:</strong> ~12 miles (20 km) | <strong>Reception Venue:</strong> ~30 miles (49 km)</p>
+    </div>
+    <a href="https://www.tripadvisor.com/Hotel_Review-g56260-d7263060-Reviews-Sheraton_McKinney_Hotel-McKinney_Texas.html" target="_blank" class="btn">View</a>
+  </div>
+
+  <div class="card hotel-card">
+    <div class="card-info">
+      <h3>Fairfield by Marriott Inn & Suites Dallas McKinney</h3>
+      <p><strong>Location:</strong> 1600 Hardin Boulevard, McKinney, TX 75071</p>
+      <p><strong>Phone:</strong> +1 (469) 796-5300</p>
+      <p><strong>Distance to Traditional Venue:</strong> ~6 miles (10 km) | <strong>Reception Venue:</strong> ~34 miles (54 km)</p>
+    </div>
+    <a href="https://www.tripadvisor.com/Hotel_Review-g56260-d23803682-Reviews-Fairfield_by_Marriott_Inn_Suites_Dallas_McKinney-McKinney_Texas.html" target="_blank" class="btn">View</a>
+  </div>
+
+  <div class="card hotel-card">
+    <div class="card-info">
+      <h3>Hampton Inn & Suites McKinney</h3>
+      <p><strong>Location:</strong> 2008 North Central Expressway, McKinney, TX 75069</p>
+      <p><strong>Phone:</strong> +1 (972) 542-6622</p>
+      <p><strong>Distance to Traditional Venue:</strong> ~7 miles (11 km) | <strong>Reception Venue:</strong> ~34 miles (55 km)</p>
+    </div>
+    <a href="https://www.tripadvisor.com/Hotel_Review-g56260-d7394630-Reviews-Hampton_Inn_Suites_McKinney-McKinney_Texas.html" target="_blank" class="btn">View</a>
+  </div>
+
+  <div class="card hotel-card">
+    <div class="card-info">
+      <h3>Tru by Hilton McKinney</h3>
+      <p><strong>Location:</strong> 3100 Craig Drive, McKinney, TX 75070</p>
+      <p><strong>Phone:</strong> +1 (214) 548-4808</p>
+      <p><strong>Distance to Traditional Venue:</strong> ~11 miles (19 km) | <strong>Reception Venue:</strong> ~29 miles (47 km)</p>
+    </div>
+    <a href="https://www.tripadvisor.com/Hotel_Review-g56260-d28654430-Reviews-Tru_by_Hilton_McKinney-McKinney_Texas.html" target="_blank" class="btn">View</a>
+  </div>
+
+  <h2 class="category-title">🚗 Getting Around</h2>
+
+  <div class="card">
+    <h3>Transportation Tips</h3>
+    <p><strong>Rental Car:</strong> Recommended if you plan to explore the area. Book in advance for best rates.</p>
+    <p><strong>Rideshare:</strong> Uber and Lyft are readily available throughout the area.</p>
+    <p><strong>Public Transit:</strong> Dallas Area Rapid Transit (DART) offers bus and rail services, but may have limited coverage depending on your destination.</p>
+  </div>
+
+  <h2 class="category-title">💡 Travel Tips</h2>
+
+  <div class="info-box">
+    <p><strong>Book Early:</strong> The days surrounding our wedding coincide with Memorial Day weekend and several graduations in the DFW area. We highly recommend booking your travel accommodations early to secure the best rates.</p>
+    <p><strong>Local Attractions:</strong> If you have some extra time during your visit, consider exploring our <span class="tooltip-container"><a href="#" id="guideLink" style="color: var(--color-primary); text-decoration: underline; cursor: pointer;">Things to Do guide</a><span class="tooltip" id="tooltip">Guide coming soon!</span></span></p>
+    <p><strong>Weather:</strong> Late May typically brings warm weather in Dallas. Pack accordingly!</p>
+    <p><strong>Time Zone:</strong> Central Time Zone(CT)</p>
   </div>
 
 </section>
 
 <footer>
-  With love, Toluwani & Temilola 💕
+  Safe travels — we can't wait to see you!<br>
+  Toluwani & Temilola 💕
 </footer>
 
-<script src="js/music-player.js"></script>
-<script src="js/countdown.js"></script>
+<script>
+  // Tooltip for guide link
+  const guideLink = document.getElementById('guideLink');
+  const tooltip = document.getElementById('tooltip');
+  let hideTimeout;
+  
+  guideLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    tooltip.classList.add('show');
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+      tooltip.classList.remove('show');
+    }, 3000); // Longer display time for mobile
+  });
+  
+  guideLink.addEventListener('mouseenter', function() {
+    clearTimeout(hideTimeout);
+    tooltip.classList.add('show');
+  });
+  
+  guideLink.addEventListener('mouseleave', function() {
+    hideTimeout = setTimeout(() => {
+      tooltip.classList.remove('show');
+    }, 200);
+  });
+</script>
+
+<script src="../js/music-player.js"></script>
 
 </body>
 </html>
