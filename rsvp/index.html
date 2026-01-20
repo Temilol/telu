@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — RSVP</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    html {
+      overscroll-behavior-y: none;
+      min-height: 100vh;
+    }
+
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+      --success: #4CAF50;
+      --error: #f44336;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    /* Side Images */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-image: url('../image.jpg');
+      background-size: cover;
+      background-position: 38% center;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+    }
+
+    body::after {
+      right: 0;
+    }
+
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 150px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+    }
+    
+    header {
+      text-align: center;
+      padding: 20px 20px 25px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: var(--color-text);
+    }
+
+    .breadcrumb {
+      max-width: 800px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #b57753;
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      margin: 0 8px;
+    }
+
+    .rsvp-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .search-section {
+      background: var(--card-bg);
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    .search-section h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--color-primary);
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    .search-section p {
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 15px 20px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .btn-search {
+      padding: 15px 30px;
+      margin-top: 10px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+      align-self: center;
+      min-width: 150px;
+    }
+
+    .btn-search:hover {
+      background: #b57753;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .search-results {
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .guest-item {
+      padding: 15px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .guest-item:hover {
+      border-color: var(--color-primary);
+      background: #fafafa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+
+    .guest-item.selected {
+      border-color: var(--color-primary);
+      background: #f8f3f6;
+    }
+
+    .guest-name {
+      font-weight: 600;
+      color: var(--color-text);
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    .guest-details {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .rsvp-form {
+      background: var(--card-bg);
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
+      display: none;
+    }
+
+    .rsvp-form.show {
+      display: block;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .rsvp-form h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--color-primary);
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .radio-option {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .radio-option input[type="radio"] {
+      display: none;
+    }
+
+    .radio-label {
+      display: block;
+      padding: 15px 20px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .radio-option input[type="radio"]:checked + .radio-label {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .radio-label:hover {
+      border-color: var(--color-primary);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+      min-height: 100px;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .event-selection {
+      margin-bottom: 20px;
+    }
+
+    .event-checkbox {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .event-checkbox:hover {
+      border-color: var(--color-primary);
+      background: #fafafa;
+    }
+
+    .event-checkbox input[type="checkbox"] {
+      margin-right: 12px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .event-checkbox label {
+      cursor: pointer;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-submit:hover {
+      background: #b57753;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .btn-submit:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      display: none;
+    }
+
+    .message.success {
+      background: #e8f5e9;
+      color: var(--success);
+      border: 2px solid var(--success);
+      display: block;
+    }
+
+    .message.error {
+      background: #ffebee;
+      color: var(--error);
+      border: 2px solid var(--error);
+      display: block;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 30px;
+      color: #999;
+    }
+
+    .attendee-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .attendee-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 15px;
+      background: #fafafa;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      transition: border-color 0.3s ease;
+    }
+
+    .attendee-input-group.not-attending {
+      background: #f5f5f5;
+      opacity: 0.7;
+    }
+
+    .attendee-input-group label {
+      font-weight: 500;
+      color: var(--color-text);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .attendee-checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .attendee-checkbox-wrapper input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .attendee-checkbox-wrapper label {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .attendee-input-group input[type="text"][type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .attendee-input-group input[type="text"]:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .attendee-input-group input[type="text"]:required {
+      border-left: 4px solid var(--color-primary);
+    }
+
+    .attendee-input-group input[type="text"]:disabled {
+      background: #e9ecef;
+      cursor: not-allowed;
+      color: #999;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: var(--color-text);
+      font-size: 0.9rem;
+      background: var(--color-secondary);
+      margin-top: auto;
+    }
+
+    /* Floating Music Toggle Button */
+    .music-floating-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      color: var(--color-primary);
+      border: 3px solid var(--color-primary);
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      z-index: 999;
+    }
+
+    .music-floating-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+    }
+
+    .music-floating-btn.playing {
+      animation: pulseGlow 2.3s infinite ease-in-out;
+      border-color: #d8a17a;
+      color: #c48762;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(198, 138, 101, 0.55);
+      }
+      100% {
+        box-shadow: 0 0 0px rgba(198, 138, 101, 0.3);
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .search-section,
+      .rsvp-form {
+        padding: 25px 20px;
+      }
+      .radio-option {
+        min-width: 100%;
+      }
+      .search-box {
+        flex-direction: column;
+      }
+      .btn-search {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Toluwani & Temilola</h1>
+  <p>RSVP — We can't wait to celebrate with you!</p>
+</header>
+
+<main>
+  <!-- <nav class="breadcrumb">
+    <a href="/">Home</a> <span>/</span> <span>RSVP</span>
+  </nav> -->
+
+  <div class="rsvp-container">
+
+  <div class="search-section">
+    <h2 style="text-align: center;">Find Your Invitation</h2>
+    <p style="text-align: center;">
+        Kindly let us know your plans by <strong>February 28th</strong>. We hope to celebrate with you!<br>
+        <!-- <em>Please note that this is only for our guests in Nigeria, for other guests kindly RSVP via <a href="https://twotimesthelove.com" target="_blank" style="color: var(--color-primary); text-decoration: none;">twotimesthelove.com</a></em> -->
+    </p>
+    <div class="search-box">
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="search-input" 
+        placeholder="First and last name"
+        autocomplete="off"
+      />
+      <button id="searchButton" class="btn-search">Search</button>
+    </div>
+
+    <div id="searchResults" class="search-results"></div>
+  </div>
+
+  <div id="rsvpForm" class="rsvp-form">
+    <div id="message" class="message"></div>
+    
+    <h3 id="guestNameTitle">RSVP for [Guest Name]</h3>
+    
+    <form id="rsvpFormElement">
+      <div class="form-group">
+        <label>Will you be attending?</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="attendance" id="attendingYes" value="yes" required>
+            <label for="attendingYes" class="radio-label">Yes</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="attendance" id="attendingNo" value="no" required>
+            <label for="attendingNo" class="radio-label">No</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="eventSelection" class="form-group" style="display: none;">
+        <label>Which event(s) will you attend?</label>
+        <div class="event-selection">
+          <div class="event-checkbox">
+            <input type="checkbox" id="traditionalEvent" name="events" value="traditional">
+            <label for="traditionalEvent">Traditional Yoruba Wedding<br><small style="color: #666; font-weight: 400;">Thursday, May 28 • 6:00 PM</small></label>
+          </div>
+          <div class="event-checkbox">
+            <input type="checkbox" id="whiteWeddingEvent" name="events" value="white-wedding">
+            <label for="whiteWeddingEvent">White Wedding Ceremony<br><small style="color: #666; font-weight: 400;">Saturday, May 30 • 12:00 PM</small></label>
+          </div>
+          <div class="event-checkbox">
+            <input type="checkbox" id="receptionEvent" name="events" value="reception">
+            <label for="receptionEvent">Wedding Reception<br><small style="color: #666; font-weight: 400;">Saturday, May 30 • 4:00 PM</small></label>
+          </div>
+        </div>
+      </div>
+
+      <div id="attendeeDetails" class="form-group" style="display: none;">
+        <label>Please provide names for all attendees in your party</label>
+        <div id="attendeeList" class="attendee-list"></div>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit RSVP</button>
+    </form>
+  </div>
+
+  <div id="confirmationSection" class="rsvp-form" style="display: none;">
+    <div style="text-align: center; padding: 20px;">
+      <!-- <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div> -->
+      <h3 id="confirmationTitle" style="color: var(--color-primary); margin-bottom: 20px;">Thank You!</h3>
+      <div id="confirmationMessage" style="font-size: 1.1rem; line-height: 1.8; color: var(--color-text);"></div>
+    </div>
+  </div>
+
+  </div>
+</main>
+
+<footer>
+  Thank you for being part of our special day 💕<br>
+  Toluwani & Temilola
+</footer>
+
+<script src="../js/music-player.js"></script>
+<script src="../js/rsvp.js"></script>
+
+</body>
+</html>
