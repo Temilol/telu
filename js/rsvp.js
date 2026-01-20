@@ -364,16 +364,22 @@ function generateAttendeeFields() {
           "";
 
     attendeeDiv.innerHTML = `
-      <label for="attendee${i}">${label} Full Name</label>
-      <input 
-        type="text" 
-        id="attendee${i}" 
-        name="attendee${i}" 
-        value="${defaultName}"
-        placeholder="Enter full name"
-        ${i === 0 ? "required readonly" : "required"}
-        data-attendee-index="${i}"
-      />
+      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+        <label for="attendee${i}" style="margin: 0;">${label} Full Name</label>
+        ${i === 0 ? '<span class="info-icon-wrapper"><svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span class="tooltip">This field cannot be edited. Please contact the couple for any updates to the name.</span></span>' : ""}
+      </div>
+      <div class="input-with-icon">
+        <input 
+          type="text" 
+          id="attendee${i}" 
+          name="attendee${i}" 
+          value="${defaultName}"
+          placeholder="Please enter the guest's full name"
+          ${i === 0 ? "readonly" : ""}
+          data-attendee-index="${i}"
+        />
+        ${i === 0 ? '<span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>' : ""}
+      </div>
       ${
         i > 0
           ? `
@@ -393,6 +399,20 @@ function generateAttendeeFields() {
 
     attendeeList.appendChild(attendeeDiv);
 
+    // Add touch/click handler for info icon on mobile
+    if (i === 0) {
+      setTimeout(() => {
+        const infoIcon = attendeeDiv.querySelector(".info-icon-wrapper");
+        if (infoIcon) {
+          infoIcon.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const tooltip = infoIcon.querySelector(".tooltip");
+            tooltip.classList.toggle("tooltip-visible");
+          });
+        }
+      }, 0);
+    }
+
     // Add event listener for not-attending checkbox if it's not the primary guest
     if (i > 0) {
       setTimeout(() => {
@@ -405,11 +425,9 @@ function generateAttendeeFields() {
             if (e.target.checked) {
               input.value = "";
               input.disabled = true;
-              input.required = false;
               group.classList.add("not-attending");
             } else {
               input.disabled = false;
-              input.required = true;
               group.classList.remove("not-attending");
             }
           });
@@ -499,6 +517,10 @@ function showMessage(text, type) {
   const messageDiv = document.getElementById("message");
   messageDiv.innerHTML = text;
   messageDiv.className = `message ${type}`;
+  messageDiv.style.display = "block"; // Override any inline display:none
+  messageDiv.style.background = ""; // Clear inline styles
+  messageDiv.style.color = "";
+  messageDiv.style.border = "";
 
   // Scroll to message
   messageDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -507,6 +529,7 @@ function showMessage(text, type) {
   if (type !== "success") {
     setTimeout(() => {
       messageDiv.className = "message";
+      messageDiv.style.display = "none";
     }, 5000);
   }
 }
@@ -522,6 +545,12 @@ function handleSubmit(e) {
 
   const formData = new FormData(e.target);
   const attendance = formData.get("attendance");
+
+  // Check if attendance is selected
+  if (!attendance) {
+    showMessage("Please select whether you will be attending or not.", "error");
+    return;
+  }
 
   // Validate events if attending
   if (attendance === "yes") {
@@ -775,6 +804,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Form submission
   rsvpFormElement.addEventListener("submit", handleSubmit);
+
+  // Close tooltip when clicking anywhere else on the page
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".info-icon-wrapper")) {
+      document.querySelectorAll(".tooltip").forEach((tooltip) => {
+        tooltip.classList.remove("tooltip-visible");
+      });
+    }
+  });
 });
 
 // Export functions for potential backend integration
