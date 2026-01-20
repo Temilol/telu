@@ -106,7 +106,6 @@ const guestList = [
       "Ryan Jones",
     ],
   },
-  // Add more guests as needed
 ];
 
 // Google Sheets Configuration
@@ -515,7 +514,6 @@ function handleSubmit(e) {
   const rsvp = {
     guestId: selectedGuest.id,
     guestName: `${selectedGuest.firstName} ${selectedGuest.lastName}`,
-    email: selectedGuest.email,
     partySize: selectedGuest.partySize,
     attendance: attendance,
     events: attendance === "yes" ? formData.getAll("events") : [],
@@ -602,7 +600,6 @@ async function loadExistingRSVP(guestId) {
       return {
         guestId: rsvpData.guestId,
         guestName: rsvpData.guestName,
-        email: rsvpData.email,
         partySize: rsvpData.partySize,
         attendance: rsvpData.attendance,
         attendeeCount: rsvpData.attendeeCount,
@@ -634,7 +631,6 @@ async function sendToGoogleSheets(rsvp) {
     const sheetData = {
       guestId: rsvp.guestId,
       guestName: rsvp.guestName,
-      email: rsvp.email,
       partySize: rsvp.partySize,
       attendance: rsvp.attendance,
       attendeeCount: rsvp.attendeeCount,
@@ -738,14 +734,11 @@ window.RSVPManager = {
       [
         "Guest ID",
         "Guest Name",
-        "Email",
         "Party Size",
         "Attendance",
         "Attendee Count",
         "Attendee Names",
         "Events",
-        "Dietary",
-        "Notes",
         "Submitted At",
       ],
     ];
@@ -761,14 +754,11 @@ window.RSVPManager = {
         csvRows.push([
           guest.id,
           rsvp.guestName,
-          guest.email,
           guest.partySize,
           rsvp.attendance,
           rsvp.attendeeCount || 0,
           attendeeNames,
           rsvp.events.join("; "),
-          rsvp.dietary || "None",
-          rsvp.notes || "None",
           new Date(rsvp.submittedAt).toLocaleString(),
         ]);
       }

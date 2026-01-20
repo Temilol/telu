@@ -10,13 +10,12 @@ Follow these steps to set up Google Sheets as your RSVP database:
 4. In the first row, add these column headers:
    - A1: Guest ID
    - B1: Guest Name
-   - C1: Email
-   - D1: Party Size
-   - E1: Attendance
-   - F1: Attendee Count
-   - G1: Attendee Names
-   - H1: Events
-   - I1: Submitted At
+   - C1: Party Size
+   - D1: Attendance
+   - E1: Attendee Count
+   - F1: Attendee Names
+   - G1: Events
+   - H1: Submitted At
 
 ## Step 2: Create Google Apps Script
 
@@ -29,23 +28,22 @@ function doPost(e) {
   try {
     // Get the active spreadsheet
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
+
     // Parse the incoming data
     var data = JSON.parse(e.postData.contents);
-    
+
     // Create a row with the data
     var row = [
       data.guestId,
       data.guestName,
-      data.email,
       data.partySize,
       data.attendance,
       data.attendeeCount,
       data.attendeeNames,
       data.events,
-      data.submittedAt
+      data.submittedAt,
     ];
-    
+
     // Check if guest already submitted (update existing row)
     var existingRow = findGuestRow(sheet, data.guestId);
     if (existingRow > 0) {
@@ -55,17 +53,16 @@ function doPost(e) {
       // Add new row
       sheet.appendRow(row);
     }
-    
+
     // Return success response
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'success' }))
-      .setMimeType(ContentService.MimeType.JSON);
-      
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "success" }),
+    ).setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
     // Return error response
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "error", message: error.toString() }),
+    ).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
@@ -73,43 +70,41 @@ function doGet(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var guestId = e.parameter.guestId;
-    
+
     if (!guestId) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: 'error', message: 'Guest ID required' }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(
+        JSON.stringify({ status: "error", message: "Guest ID required" }),
+      ).setMimeType(ContentService.MimeType.JSON);
     }
-    
+
     // Find the guest's RSVP
     var existingRow = findGuestRow(sheet, guestId);
-    
+
     if (existingRow > 0) {
-      var rowData = sheet.getRange(existingRow, 1, 1, 9).getValues()[0];
+      var rowData = sheet.getRange(existingRow, 1, 1, 8).getValues()[0];
       var rsvp = {
         guestId: rowData[0],
         guestName: rowData[1],
-        email: rowData[2],
-        partySize: rowData[3],
-        attendance: rowData[4],
-        attendeeCount: rowData[5],
-        attendeeNames: rowData[6],
-        events: rowData[7],
-        submittedAt: rowData[8]
+        partySize: rowData[2],
+        attendance: rowData[3],
+        attendeeCount: rowData[4],
+        attendeeNames: rowData[5],
+        events: rowData[6],
+        submittedAt: rowData[7],
       };
-      
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: 'success', data: rsvp }))
-        .setMimeType(ContentService.MimeType.JSON);
+
+      return ContentService.createTextOutput(
+        JSON.stringify({ status: "success", data: rsvp }),
+      ).setMimeType(ContentService.MimeType.JSON);
     } else {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: 'not_found' }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(
+        JSON.stringify({ status: "not_found" }),
+      ).setMimeType(ContentService.MimeType.JSON);
     }
-    
   } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "error", message: error.toString() }),
+    ).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
@@ -166,12 +161,14 @@ Replace `YOUR_WEB_APP_URL_HERE` with the URL you copied in Step 3.
 ## How It Works
 
 **For Guests:**
+
 - When they search for their name, the system checks Google Sheets for previous submissions
 - If found, their previous answers are pre-filled
 - They can update their response from any device/browser
 - A message shows: "You've already submitted an RSVP. You can update your response below."
 
 **For You:**
+
 - All responses stored centrally in Google Sheets
 - No duplicate entries - updates replace previous responses
 - Real-time access from anywhere
@@ -187,6 +184,7 @@ Replace `YOUR_WEB_APP_URL_HERE` with the URL you copied in Step 3.
 ## Viewing Your Data
 
 Your Google Sheet will automatically update in real-time as guests submit RSVPs. You can:
+
 - Sort and filter the data
 - Create charts and summaries
 - Export to CSV for other tools
