@@ -219,10 +219,14 @@ function searchGuests(query) {
 // Display search results
 function displaySearchResults(results) {
   const searchResults = document.getElementById("searchResults");
+  const searchResultsFooter = document.getElementById("searchResultsFooter");
   const searchInput = document.getElementById("searchInput");
   const searchQuery = searchInput.value.trim();
 
   if (results.length === 0) {
+    // Hide footer
+    searchResultsFooter.style.display = "none";
+    
     // Only show error message if there's an actual search query
     if (searchQuery && searchQuery.length >= 2) {
       searchResults.innerHTML = `
@@ -237,32 +241,54 @@ function displaySearchResults(results) {
     return;
   }
 
-  searchResults.innerHTML = results
-    .map((guest) => {
-      const additionalGuestsText =
-        guest.additionalGuests && guest.additionalGuests.length > 0
-          ? `<div style="font-size: 0.85rem; color: #666; margin-top: 3px;">+ ${guest.additionalGuests.join(", ")}</div>`
-          : "";
+  searchResults.innerHTML = `
+    <div class="search-results-title">Select your info below or try searching again.</div>
+    ${results
+      .map((guest) => {
+        const additionalGuestsText =
+          guest.additionalGuests && guest.additionalGuests.length > 0
+            ? guest.additionalGuests.map(name => `<div class="guest-name">${name}</div>`).join("")
+            : "";
 
-      return `
-      <div class="guest-item" data-guest-id="${guest.id}">
-        <div class="guest-name">${guest.firstName} ${guest.lastName}</div>
-        ${additionalGuestsText}
-        <div class="guest-details">
-          Party size: ${guest.partySize}
+        return `
+        <div class="guest-item" data-guest-id="${guest.id}">
+          <div class="guest-info">
+            <div class="guest-name">${guest.firstName} ${guest.lastName}</div>
+            ${additionalGuestsText}
+            <div class="guest-details">
+              Party size: ${guest.partySize}
+            </div>
+          </div>
+          <button class="select-button" data-guest-id="${guest.id}">Select</button>
         </div>
-      </div>
-    `;
-    })
-    .join("");
+      `;
+      })
+      .join("")}
+  `;
 
-  // Add click handlers
-  document.querySelectorAll(".guest-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const guestId = parseInt(item.dataset.guestId);
+  // Show and populate footer
+  searchResultsFooter.innerHTML = `
+    If none of these are you, please reach out to the couple to see exactly how they entered your details.<br><br>
+    Still having trouble? Reach out to the couple and request access to their RSVP page.
+  `;
+  searchResultsFooter.style.display = "block";
+
+  // Add click handlers for select buttons
+  document.querySelectorAll(".select-button").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const guestId = parseInt(button.dataset.guestId);
       selectGuest(guestId);
     });
   });
+
+  // Scroll to search results title
+  setTimeout(() => {
+    const titleElement = document.querySelector(".search-results-title");
+    if (titleElement) {
+      titleElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, 100);
 }
 
 // Select a guest

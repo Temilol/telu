@@ -65,14 +65,21 @@
       right: 0;
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1400px) {
       body::before,
       body::after {
-        width: 150px;
+        width: 100px;
       }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 80px;
+      }
+    }
+
+    @media (max-width: 1100px) {
       body::before,
       body::after {
         display: none;
@@ -198,8 +205,21 @@
 
     .search-results {
       margin-top: 15px;
-      max-height: 300px;
-      overflow-y: auto;
+    }
+
+    .search-results-title {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .search-results-footer {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 15px;
+      line-height: 1.5;
+      text-align: left;
     }
 
     .guest-item {
@@ -210,6 +230,10 @@
       cursor: pointer;
       transition: all 0.3s ease;
       background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
     }
 
     .guest-item:hover {
@@ -224,6 +248,10 @@
       background: #f8f3f6;
     }
 
+    .guest-info {
+      flex: 1;
+    }
+
     .guest-name {
       font-weight: 600;
       color: var(--color-text);
@@ -234,6 +262,43 @@
     .guest-details {
       font-size: 0.9rem;
       color: #666;
+    }
+
+    .select-button {
+      padding: 10px 32px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 100px;
+    }
+
+    .select-button:hover {
+      background: #b47856;
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(198, 138, 101, 0.3);
+    }
+
+    .select-button:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 600px) {
+      .guest-item {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .select-button {
+        width: 100%;
+        margin-top: 10px;
+      }
     }
 
     .rsvp-form {
@@ -708,6 +773,7 @@
     </div>
 
     <div id="searchResults" class="search-results"></div>
+    <div id="searchResultsFooter" class="search-results-footer" style="display: none;"></div>
   </div>
 
   <div id="rsvpForm" class="rsvp-form">
