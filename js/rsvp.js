@@ -226,7 +226,7 @@ function displaySearchResults(results) {
   if (results.length === 0) {
     // Hide footer
     searchResultsFooter.style.display = "none";
-    
+
     // Only show error message if there's an actual search query
     if (searchQuery && searchQuery.length >= 2) {
       searchResults.innerHTML = `
@@ -242,12 +242,14 @@ function displaySearchResults(results) {
   }
 
   searchResults.innerHTML = `
-    <div class="search-results-title">Select your info below or try searching again.</div>
+    <div class="search-results-title">Select your info below to continue or try searching again.</div>
     ${results
       .map((guest) => {
         const additionalGuestsText =
           guest.additionalGuests && guest.additionalGuests.length > 0
-            ? guest.additionalGuests.map(name => `<div class="guest-name">${name}</div>`).join("")
+            ? guest.additionalGuests
+                .map((name) => `<div class="guest-name">${name}</div>`)
+                .join("")
             : "";
 
         return `
@@ -416,7 +418,7 @@ function generateAttendeeFields() {
             name="notAttending${i}"
             data-attendee-index="${i}"
           />
-          <label for="notAttending${i}">This guest will not be attending</label>
+          <label for="notAttending${i}">Mark the checkbox if the guest will not be attending</label>
         </div>
       `
           : ""
