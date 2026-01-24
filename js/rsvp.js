@@ -14,7 +14,7 @@ const guestList = [
     lastName: "Oduwole",
     plusOne: true,
     partySize: 3,
-    additionalGuests: ["Tunde Oduwole", "Kikelomo Oduwole", "Ayotunde Oduwole"],
+    additionalGuests: ["Kikelomo Oduwole", "Ayotunde Oduwole"],
   },
   {
     id: 2,
