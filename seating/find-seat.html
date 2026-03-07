@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — Find Your Seat</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    html {
+      overscroll-behavior-y: none;
+    }
+
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      position: relative;
+    }
+
+    /* Side Images */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-image: url('../image.jpg');
+      background-size: cover;
+      background-position: 38% center;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+    }
+
+    body::after {
+      right: 0;
+    }
+
+    @media (max-width: 1400px) {
+      body::before,
+      body::after {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 80px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 20px 25px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: var(--color-text);
+    }
+
+    .breadcrumb {
+      max-width: 800px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #b57753;
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      margin: 0 8px;
+    }
+
+    .section-wrapper {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      min-height: 60vh;
+    }
+
+    /* Search Section */
+    .search-section {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .search-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      margin: 0 0 20px 0;
+      color: var(--color-primary);
+    }
+
+    .search-section p {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 18px 50px 18px 20px;
+      font-size: 1.1rem;
+      border: 2px solid var(--color-secondary);
+      border-radius: 30px;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(198, 138, 101, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-primary);
+      font-size: 1.4rem;
+    }
+
+    .search-result {
+      margin-top: 40px;
+      padding: 30px;
+      background: linear-gradient(135deg, #fff9f4 0%, #fef5ed 100%);
+      border-radius: 16px;
+      border-left: 6px solid var(--color-primary);
+      display: none;
+      text-align: left;
+    }
+
+    .search-result.show {
+      display: block;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-name {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0 0 20px 0;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .result-info {
+      font-size: 1.15rem;
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      line-height: 1.6;
+    }
+
+    .result-icon {
+      font-size: 1.5rem;
+      min-width: 30px;
+    }
+
+    .no-result {
+      margin-top: 30px;
+      padding: 25px;
+      background: #fff3cd;
+      border-radius: 12px;
+      color: #856404;
+      border-left: 4px solid #ffc107;
+      display: none;
+    }
+
+    .no-result.show {
+      display: block;
+      animation: slideIn 0.4s ease;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #4CAF50;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .info-box p {
+      margin: 8px 0;
+    }
+
+    .view-map-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 30px;
+      background: var(--color-primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(198, 138, 101, 0.3);
+    }
+
+    .view-map-btn:hover {
+      background: #b57753;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(198, 138, 101, 0.4);
+    }
+
+    footer {
+      background: var(--color-secondary);
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 60px;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      header p {
+        font-size: 1rem;
+      }
+
+      .search-section {
+        padding: 25px;
+      }
+
+      .search-section h2 {
+        font-size: 1.8rem;
+      }
+
+      .result-name {
+        font-size: 1.5rem;
+      }
+
+      .result-info {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🔍 Find Your Seat</h1>
+  <p>Search for Your Table Assignment</p>
+</header>
+
+<nav class="breadcrumb">
+  <a href="../index.html">Home</a>
+  <span>›</span>
+  <a href="index.html">Seating Chart</a>
+  <span>›</span>
+  <span>Find Your Seat</span>
+</nav>
+
+<section class="section-wrapper">
+  
+  <div class="info-box">
+    <p>🎉 <strong>Welcome!</strong> Enter your name below to find your table assignment for the reception.</p>
+    <p>📍 Need to see the full venue layout? <a href="index.html" style="color: var(--color-primary); font-weight: 600;">View the seating chart</a></p>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <h2>Find Your Table</h2>
+    <p>Enter your name to see your table assignment</p>
+    
+    <div class="search-box">
+      <input 
+        type="text" 
+        id="guestSearch" 
+        class="search-input" 
+        placeholder="Enter your name..."
+        autocomplete="off"
+      />
+      <span class="search-icon">🔎</span>
+    </div>
+
+    <div id="searchResult" class="search-result">
+      <div class="result-name" id="resultName"></div>
+      <div class="result-info">
+        <span class="result-icon">🪑</span>
+        <span id="resultTable"></span>
+      </div>
+      <div class="result-info">
+        <span class="result-icon">👥</span>
+        <span id="resultTablemates"></span>
+      </div>
+      <a href="index.html" class="view-map-btn">📍 View on Map</a>
+    </div>
+
+    <div id="noResult" class="no-result">
+      <strong>No guest found with that name.</strong> Please check your spelling or contact us if you believe this is an error.
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  We look forward to celebrating with you!<br>
+  Toluwani & Temilola 💕
+</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnsqsedAD_xPFWS7SZYq28CAItMe95p5E",
+    authDomain: "telu-wedding-website.firebaseapp.com",
+    projectId: "telu-wedding-website",
+    storageBucket: "telu-wedding-website.firebasestorage.app",
+    messagingSenderId: "656223267446",
+    appId: "1:656223267446:web:c25ac288b3c08fcfc58d57",
+    measurementId: "G-TBY7P9NZXW"
+  };
+  
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  
+  // Make Firebase functions available globally
+  window.firebaseDB = db;
+  window.firebaseDoc = doc;
+  window.firebaseGetDoc = getDoc;
+  window.firebaseSetDoc = setDoc;
+  window.firebaseCollection = collection;
+  window.firebaseGetDocs = getDocs;
+  window.firebaseInitialized = true;
+</script>
+
+<script src="../js/seating-chart.js"></script>
+<script src="../js/firebase-seating.js"></script>
+<script>
+  // Setup search functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById("guestSearch");
+    const searchResult = document.getElementById("searchResult");
+    const noResult = document.getElementById("noResult");
+
+    // Real-time search as user types
+    searchInput.addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+
+      // Hide results if query is empty
+      if (query === "") {
+        searchResult.classList.remove("show");
+        noResult.classList.remove("show");
+        return;
+      }
+
+      // Search for guest
+      const result = findGuest(query);
+
+      if (result) {
+        displayResult(result);
+        searchResult.classList.add("show");
+        noResult.classList.remove("show");
+      } else {
+        searchResult.classList.remove("show");
+        noResult.classList.add("show");
+      }
+    });
+
+    // Also trigger search on Enter key
+    searchInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        this.blur();
+      }
+    });
+  });
+
+  // Display search result
+  function displayResult(result) {
+    document.getElementById("resultName").textContent = result.name;
+    document.getElementById("resultTable").textContent = `Table ${result.tableNumber}`;
+
+    const tablematesText =
+      result.tablemates.length > 0
+        ? `Seated with: ${result.tablemates.join(", ")}`
+        : "Single table";
+    document.getElementById("resultTablemates").textContent = tablematesText;
+  }
+</script>
+
+</body>
+</html>

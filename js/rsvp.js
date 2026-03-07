@@ -160,6 +160,14 @@ const guestList = [
     partySize: 1,
     additionalGuests: [],
   },
+  {
+    id: 20,
+    firstName: "Temi",
+    lastName: "Adelola",
+    plusOne: true,
+    partySize: 7,
+    additionalGuests: ["Salah mosaic"],
+  },
 ];
 
 // Google Sheets Configuration
@@ -766,11 +774,16 @@ async function sendToGoogleSheets(rsvp) {
   }
 }
 
-// Initialize
+// Initialize - only on RSVP page
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchInput");
   const searchButton = document.getElementById("searchButton");
   const rsvpFormElement = document.getElementById("rsvpFormElement");
+
+  // Only run if these elements exist (we're on the RSVP page, not seating chart)
+  if (!searchInput || !searchButton || !rsvpFormElement) {
+    return;
+  }
 
   // Search function
   const performSearch = () => {

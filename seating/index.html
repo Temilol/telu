@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Toluwani & Temilola — Seating Chart</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    html {
+      overscroll-behavior-y: none;
+    }
+
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+      --highlight: #f0c891;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      position: relative;
+    }
+
+    /* Side Images */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-image: url('../image.jpg');
+      background-size: cover;
+      background-position: 38% center;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+    }
+
+    body::after {
+      right: 0;
+    }
+
+    @media (max-width: 1400px) {
+      body::before,
+      body::after {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 80px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 20px 25px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: var(--color-text);
+    }
+
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #b57753;
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      margin: 0 8px;
+    }
+
+    .section-wrapper {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    /* Admin Controls */
+    .admin-controls {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    .admin-controls h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin: 0 0 20px 0;
+      color: var(--color-primary);
+      text-align: center;
+    }
+
+    .control-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .primary-btn {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: #b57753;
+    }
+
+    .control-btn:not(.primary-btn):not(.danger-btn) {
+      background: white;
+      border: 2px solid var(--color-secondary);
+      color: var(--color-text);
+    }
+
+    .danger-btn {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .danger-btn:hover {
+      background: #ee5a52;
+    }
+
+    /* Modal for adding/editing tables */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--color-primary);
+      margin: 0 0 20px 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid var(--color-secondary);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Guest Search & Tags */
+    #guestSearch {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid var(--color-secondary);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1001;
+      display: none;
+      margin-top: -2px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-suggestions.show {
+      display: block;
+    }
+
+    .suggestion-item {
+      padding: 10px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .suggestion-item:hover {
+      background-color: var(--color-secondary);
+    }
+
+    .suggestion-item.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: #f9f9f9;
+    }
+
+    .suggestion-item.disabled:hover {
+      background-color: #f9f9f9;
+    }
+
+    .suggestion-status {
+      font-size: 0.85rem;
+      color: #999;
+      margin-left: 5px;
+    }
+
+    .guest-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      background: #f9f9f9;
+      border: 2px solid var(--color-secondary);
+      border-radius: 8px;
+      min-height: 40px;
+      align-items: center;
+    }
+
+    .guest-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .guest-tag-remove {
+      cursor: pointer;
+      font-weight: bold;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .guest-tag-remove:hover {
+      opacity: 1;
+    }
+
+    .guest-tags-container.empty {
+      color: #999;
+      font-style: italic;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 25px;
+    }
+
+    .form-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel {
+      background: #e0e0e0;
+      color: var(--color-text);
+    }
+
+    .btn-save {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-save:hover {
+      background: #b57753;
+    }
+
+    /* Visual Seating Chart */
+    .chart-section {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 40px;
+    }
+
+    .chart-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin: 0 0 30px 0;
+      color: var(--color-primary);
+      text-align: center;
+    }
+
+    .venue-container {
+      position: relative;
+      min-height: 1100px;
+      height: auto;
+      background: linear-gradient(135deg, #faf8f6 0%, #f5f1ed 100%);
+      border-radius: 12px;
+      padding: 40px 20px 40px 20px;
+      overflow: auto;
+      cursor: grab;
+    }
+
+    .venue-container:active {
+      cursor: grabbing;
+    }
+
+    /* Zoom Controls */
+    .zoom-controls {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .zoom-btn {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border: 2px solid var(--color-primary);
+      border-radius: 8px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--color-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      user-select: none;
+    }
+
+    .zoom-btn:hover {
+      background: var(--color-primary);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(198, 138, 101, 0.3);
+    }
+
+    .zoom-level {
+      background: white;
+      border: 2px solid var(--color-secondary);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text);
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Floating Add Button (only visible in fullscreen) */
+    .floating-add-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      background: var(--color-primary);
+      color: white;
+      border: 3px solid white;
+      border-radius: 50%;
+      font-size: 2rem;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .floating-add-btn:hover {
+      background: #b57753;
+      transform: scale(1.15);
+      box-shadow: 0 8px 30px rgba(198, 138, 101, 0.6);
+    }
+
+    .floating-add-btn:active {
+      transform: scale(1.05);
+    }
+
+    /* Show floating button only in fullscreen */
+    .venue-container:fullscreen .floating-add-btn {
+      display: flex;
+    }
+
+    /* Venue Map Wrapper for zoom/pan */
+    .venue-map-wrapper {
+      position: relative;
+      width: 100%;
+      height: 1100px;
+      overflow: hidden;
+    }
+
+    /* Venue Map - Tables with spatial positioning */
+    .venue-map {
+      position: relative;
+      width: 100%;
+      height: 1100px !important;
+      transform-origin: center center;
+      transition: transform 0.3s ease;
+    }
+
+    /* Head Table Area */
+    .head-table {
+      position: absolute;
+      left: 50%;
+      top: 8%;
+      transform: translate(-50%, -50%);
+      background: var(--color-primary);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(198, 138, 101, 0.3);
+      transition: all 0.3s ease;
+      z-index: 5;
+      cursor: grab;
+      user-select: none;
+      min-width: 250px;
+    }
+
+    .head-table.dragging {
+      cursor: grabbing;
+      z-index: 1000;
+      transition: none;
+      box-shadow: 0 8px 30px rgba(198, 138, 101, 0.5);
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    /* Dance Floor Area */
+    .dance-floor {
+      position: absolute;
+      left: 50%;
+      top: 20%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 1.8rem;
+      color: var(--color-primary);
+      background: rgba(255, 255, 255, 0.8);
+      padding: 15px 30px;
+      border-radius: 12px;
+      border: 3px dashed var(--color-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 5;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.3s ease;
+      min-width: 200px;
+    }
+
+    .dance-floor.dragging {
+      cursor: grabbing;
+      z-index: 1000;
+      transition: none;
+      box-shadow: 0 8px 30px rgba(198, 138, 101, 0.4);
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    /* Venue Map - Tables with spatial positioning */
+    .venue-map {
+      position: relative;
+      width: 100%;
+      height: 1100px !important;
+    }
+
+    .venue-table {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      z-index: 10;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .venue-table.dragging {
+      cursor: grabbing;
+      z-index: 1000;
+      transition: none;
+    }
+
+    .venue-table.dragging .table-circle {
+      box-shadow: 0 8px 30px rgba(198, 138, 101, 0.5);
+      transform: scale(1.15);
+    }
+
+    .venue-table.dragging .table-tooltip {
+      display: none !important;
+    }
+
+    .venue-table.highlighted {
+      z-index: 100;
+      animation: pulse 1.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .table-circle {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      background: white;
+      border: 4px solid var(--color-primary);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    /* Chairs around the table */
+    .table-circle::before,
+    .table-circle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: var(--color-secondary);
+      border: 2px solid var(--color-primary);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      z-index: -1;
+      box-sizing: border-box;
+    }
+
+    .table-circle::before {
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .table-circle::after {
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .venue-table::before,
+    .venue-table::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: var(--color-secondary);
+      border: 2px solid var(--color-primary);
+      border-radius: 50%;
+      top: 50%;
+      transition: all 0.3s ease;
+      z-index: -1;
+      box-sizing: border-box;
+    }
+
+    .venue-table::before {
+      left: -8px;
+      transform: translateY(-50%);
+    }
+
+    .venue-table::after {
+      right: -8px;
+      transform: translateY(-50%);
+    }
+
+    .venue-table:hover .table-circle,
+    .venue-table.highlighted .table-circle {
+      background: var(--color-primary);
+      color: white;
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(198, 138, 101, 0.4);
+    }
+
+    .venue-table:hover .table-circle::before,
+    .venue-table:hover .table-circle::after,
+    .venue-table:hover::before,
+    .venue-table:hover::after {
+      background: var(--color-primary);
+      border-color: white;
+    }
+
+    .table-number-badge {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      font-family: 'Inter', sans-serif;
+      transition: color 0.3s ease;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .venue-table:hover .table-number-badge,
+    .venue-table.highlighted .table-number-badge {
+      color: white;
+    }
+
+    .drag-hint {
+      font-size: 0.9rem;
+      margin-top: -3px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .venue-table:hover .drag-hint {
+      opacity: 1;
+    }
+
+    /* Delete button on tables */
+    .delete-table-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 28px;
+      height: 28px;
+      background: #ff6b6b;
+      color: white;
+      border: 2px solid white;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .venue-table:hover .delete-table-btn {
+      display: flex;
+    }
+
+    .delete-table-btn:hover {
+      background: #ee5a52;
+      transform: scale(1.1);
+    }
+
+    .edit-table-btn {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 28px;
+      height: 28px;
+      background: var(--color-primary);
+      color: white;
+      border: 2px solid white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .venue-table:hover .edit-table-btn {
+      display: flex;
+    }
+
+    .edit-table-btn:hover {
+      background: #b57753;
+      transform: scale(1.1);
+    }
+
+    .view-guests-btn {
+      position: absolute;
+      bottom: -10px;
+      right: -10px;
+      width: 28px;
+      height: 28px;
+      background: var(--color-primary);
+      color: white;
+      border: 2px solid white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      padding: 0;
+    }
+
+    .venue-table:hover .view-guests-btn {
+      display: flex;
+    }
+
+    .view-guests-btn:hover {
+      background: #b57753;
+      transform: scale(1.1);
+    }
+
+    .table-icon-emoji {
+      font-size: 1.2rem;
+      margin-top: -5px;
+    }
+
+    /* Table Tooltip */
+    .table-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 10px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      min-width: 220px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 1000;
+      border: 2px solid var(--color-secondary);
+    }
+
+    .venue-table.active .table-tooltip {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(-5px);
+    }
+
+    .tooltip-header {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--color-secondary);
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tooltip-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+    .tooltip-close-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .tooltip-guest-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .tooltip-guest-list li {
+      padding: 6px 8px;
+      font-size: 0.9rem;
+      color: var(--color-text);
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .tooltip-guest-list li:last-child {
+      border-bottom: none;
+    }
+
+    .tooltip-guest-list li.highlighted-guest {
+      background: linear-gradient(90deg, rgba(198, 138, 101, 0.15) 0%, transparent 100%);
+      font-weight: 600;
+      color: var(--color-primary);
+      border-radius: 4px;
+    }
+
+    /* Legend */
+    .venue-legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .legend-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid var(--color-primary);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .legend-head {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+    }
+
+    /* Info Box */
+    .info-box {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #4CAF50;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .info-box p {
+      margin: 8px 0;
+    }
+
+    footer {
+      background: var(--color-secondary);
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 60px;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      header p {
+        font-size: 1rem;
+      }
+
+      .search-section,
+      .chart-section {
+        padding: 20px;
+      }
+
+      .search-section h2,
+      .chart-section h2 {
+        font-size: 1.5rem;
+      }
+
+      .venue-container {
+        min-height: 1100px;
+      }
+
+      .venue-map {
+        height: 1100px !important;
+      }
+
+      .table-circle {
+        width: 60px;
+        height: 60px;
+      }
+
+      .table-number-badge {
+        font-size: 1.2rem;
+      }
+
+      .table-icon-emoji {
+        font-size: 1rem;
+      }
+
+      .table-tooltip {
+        min-width: 180px;
+        font-size: 0.85rem;
+      }
+
+      .dance-floor {
+        max-width: 300px;
+      }
+
+      .head-table {
+        font-size: 1rem;
+        padding: 15px;
+      }
+
+      .stage-marker {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💺 Seating Chart Editor</h1>
+  <p>Arrange Your Reception Layout</p>
+</header>
+
+<nav class="breadcrumb">
+  <a href="../index.html">Home</a>
+  <span>›</span>
+  <span>Seating Chart</span>
+  <span style="margin-left: 15px;">|</span>
+  <a href="find-seat.html" style="margin-left: 15px;">🔍 Find Your Seat</a>
+</nav>
+
+<section class="section-wrapper">
+  
+  <div class="info-box">
+    <p>✏️ <strong>Edit Mode:</strong> This is your customizable seating chart. Drag tables to arrange, click buttons to add/delete tables.</p>
+    <p>🔍 <strong>Guest Search:</strong> <a href="find-seat.html" style="color: var(--color-primary); font-weight: 600;">Use the search page</a> to help guests find their seats.</p>
+    <p>☁️ <strong>Auto-Save:</strong> All changes are automatically saved and synced across devices!</p>
+  </div>
+
+  <!-- Admin Controls -->
+  <div class="admin-controls">
+    <h2>⚙️ Table Management</h2>
+    <div class="control-buttons">
+      <button id="addTableBtn" class="control-btn primary-btn">
+        ➕ Add New Table
+      </button>
+      <button id="clearBtn" class="control-btn danger-btn">
+        🗑️ Clear All Tables
+      </button>
+    </div>
+  </div>
+
+  <!-- Visual Seating Chart -->
+  <div class="chart-section">
+    <h2>🗺️ Reception Floor Plan</h2>
+    
+    <div class="venue-container" id="venueContainer">
+      <!-- Zoom Controls -->
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomInBtn" title="Zoom In">+</button>
+        <div class="zoom-level" id="zoomLevel">100%</div>
+        <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">−</button>
+        <button class="zoom-btn" id="zoomResetBtn" title="Reset Zoom" style="font-size: 1rem;">⟲</button>
+        <button class="zoom-btn" id="fullscreenBtn" title="Fullscreen" style="font-size: 1.2rem;">⛶</button>
+      </div>
+
+      <!-- Floating Add Table Button (only visible in fullscreen) -->
+      <button class="floating-add-btn" id="floatingAddBtn" title="Add New Table">
+        ➕
+      </button>
+
+      <!-- Venue Map with spatial table positioning -->
+      <div id="venueMap" class="venue-map">
+        <!-- Head Table -->
+        <div class="head-table" id="headTable">
+          👰🤵 Head Table / Bride & Groom
+        </div>
+        
+        <!-- Dance Floor -->
+        <div class="dance-floor" id="danceFloor">
+          🎵 Dance Floor 🎵
+        </div>
+        
+        <!-- Tables will be dynamically positioned by JavaScript -->
+      </div>
+
+      <!-- Modal for Add/Edit Table (inside container for fullscreen access) -->
+      <div id="tableModal" class="modal">
+        <div class="modal-content">
+          <h2 class="modal-header" id="modalTitle">Add New Table</h2>
+          <form id="tableForm">
+            <div class="form-group">
+              <label for="tableNumber">Table Number</label>
+              <input type="number" id="tableNumber" required min="1">
+              <small id="tableNumberError" style="color: #d32f2f; display: none; margin-top: 5px;">This table number already exists</small>
+            </div>
+            <div class="form-group">
+              <label for="guestSearch">Search & Add Guests</label>
+              <input 
+                type="text" 
+                id="guestSearch" 
+                placeholder="Type guest name to search..." 
+                autocomplete="off"
+              >
+              <div id="searchSuggestions" class="search-suggestions"></div>
+            </div>
+            <div class="form-group">
+              <label>Selected Guests</label>
+              <div id="selectedGuestsTags" class="guest-tags-container"></div>
+              <small style="color: #888; display: block; margin-top: 8px;">Click an 'X' to remove a guest</small>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+              <button type="submit" class="btn-save">Save Table</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="venue-legend">
+      <div class="legend-item">
+        <div class="legend-circle legend-head">👰🤵</div>
+        <span>Head Table</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-circle">🪑</div>
+        <span>Guest Table</span>
+      </div>
+      <div class="legend-item">
+        <span>💡 <strong>Tip:</strong> Drag to move • Hover for edit/delete buttons</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  We look forward to celebrating with you!<br>
+  Toluwani & Temilola 💕
+</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  
+  // Firebase configuration - You'll need to replace this with your own
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnsqsedAD_xPFWS7SZYq28CAItMe95p5E",
+    authDomain: "telu-wedding-website.firebaseapp.com",
+    projectId: "telu-wedding-website",
+    storageBucket: "telu-wedding-website.firebasestorage.app",
+    messagingSenderId: "656223267446",
+    appId: "1:656223267446:web:c25ac288b3c08fcfc58d57",
+    measurementId: "G-TBY7P9NZXW"
+  };
+  
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  
+  // Make Firebase functions available globally
+  window.firebaseDB = db;
+  window.firebaseDoc = doc;
+  window.firebaseGetDoc = getDoc;
+  window.firebaseSetDoc = setDoc;
+  window.firebaseCollection = collection;
+  window.firebaseGetDocs = getDocs;
+  window.firebaseInitialized = true;
+</script>
+
+<script src="../js/rsvp.js"></script>
+<script src="../js/seating-chart.js"></script>
+<script src="../js/firebase-guests.js"></script>
+<script src="../js/seating-admin.js"></script>
+<script src="../js/zoom-controls.js"></script>
+<script src="../js/firebase-seating.js"></script>
+
+</body>
+</html>
