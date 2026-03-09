@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — Wedding Schedule</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    html {
+      overscroll-behavior-y: none;
+    }
+
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      position: relative;
+    }
+
+    /* Side Images */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-image: url('../image.jpg');
+      background-size: cover;
+      background-position: 38% center;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+    }
+
+    body::after {
+      right: 0;
+    }
+
+    @media (max-width: 1400px) {
+      body::before,
+      body::after {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 80px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 20px 25px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: var(--color-text);
+    }
+
+    .breadcrumb {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #b57753;
+      text-decoration: underline;
+    }
+
+    .breadcrumb span {
+      margin: 0 8px;
+    }
+
+    .schedule-section {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .schedule-intro {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .schedule-intro h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: var(--color-primary);
+      margin: 0 0 15px 0;
+    }
+
+    .schedule-intro p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+
+    .date-section {
+      margin-bottom: 40px;
+    }
+
+    .date-header {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--color-primary);
+      margin: 0 0 25px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(198, 138, 101, 0.2);
+    }
+
+    .event-timeline {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 14px var(--shadow);
+      margin-bottom: 20px;
+      transition: box-shadow 0.25s ease;
+    }
+
+    .event-timeline:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .event-icon {
+      flex-shrink: 0;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(198, 138, 101, 0.1);
+      border-radius: 50%;
+      color: var(--color-primary);
+      font-size: 1.8rem;
+    }
+
+    .event-icon svg {
+      width: 100%;
+      height: 100%;
+      color: var(--color-primary);
+    }
+
+    .event-main {
+      flex: 1;
+    }
+
+    .event-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin: 0 0 8px 0;
+      color: var(--color-primary);
+    }
+
+    .event-time {
+      font-size: 1rem;
+      color: var(--color-text);
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .event-divider {
+      width: 2px;
+      height: 80px;
+      background: #e0e0e0;
+      margin: 0 10px;
+      flex-shrink: 0;
+    }
+
+    .event-details {
+      flex: 1.2;
+    }
+
+    .event-venue {
+      font-size: 1rem;
+      color: var(--color-text);
+      font-weight: 500;
+      margin: 0 0 6px 0;
+    }
+
+    .event-address {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0 0 12px 0;
+    }
+
+    .event-address a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .event-address a:hover {
+      color: #b57753;
+      text-decoration: underline;
+    }
+
+    .event-color-day {
+      font-size: 0.9rem;
+      color: var(--color-text);
+      font-style: italic;
+      margin: 8px 0 0 0;
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      padding: 10px 20px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.25s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-action:hover {
+      background: #b57753;
+    }
+
+    .btn-action.outline {
+      background: white;
+      color: var(--color-primary);
+      border: 2px solid var(--color-primary);
+    }
+
+    .btn-action.outline:hover {
+      background: rgba(198, 138, 101, 0.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--color-secondary);
+      font-size: 0.9rem;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .event-row {
+        flex-direction: column;
+      }
+
+      .event-divider {
+        display: none;
+      }
+
+      .event-details {
+        flex: 1;
+      }
+
+      .event-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.4rem;
+      }
+
+      .event-title {
+        font-size: 1.2rem;
+      }
+
+      .event-timeline {
+        padding: 20px;
+      }
+
+      .schedule-section {
+        padding: 0 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Toluwani & Temilola</h1>
+  <p>Wedding Schedule</p>
+</header>
+
+<div class="breadcrumb">
+  <a href="/">Home</a>
+  <span>/</span>
+  <span>Wedding Schedule</span>
+</div>
+
+<section class="schedule-section">
+  <div class="schedule-intro">
+    <h2>Our Wedding Weekend</h2>
+    <p>We're so excited to celebrate this special day with you! Below is a timeline of our wedding events so you'll know what to expect.</p>
+  </div>
+
+  <!-- Thursday, May 28 -->
+  <div class="date-section">
+    <h3 class="date-header">Thursday, May 28, 2026</h3>
+    
+    <div class="event-timeline">
+      <div class="event-row">
+        <div class="event-icon">
+          <svg viewBox="0 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <g id="wedding_rings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g transform="translate(15.000000, 24.000000)" fill="currentColor" fill-rule="nonzero">
+                <path d="M38.7835616,3.75 C37.7226303,2.06794594 35.9975187,0.931758426 34.0504935,0.63272183 C32.1034683,0.333685233 30.123859,0.900877982 28.6191781,2.18888889 C26.1239185,0.046173077 22.4794493,0.00187866083 19.9342466,2.08333333 C17.3890439,0.00187866083 13.7445747,0.046173077 11.2493151,2.18888889 C9.00759192,0.278560224 5.81550157,0.025972582 3.30860308,1.56054649 C0.801704594,3.0951204 -0.464444302,6.07677651 0.15890411,8.97777778 C0.630136986,11.3888889 5.02465753,16.6333333 11.1123288,19.7222222 L11.2493151,19.7944444 L11.3863014,19.7222222 C14.6323011,18.0641668 17.5341398,15.7896647 19.9342466,13.0222222 C22.332551,15.7893011 25.232528,18.063802 28.4767123,19.7222222 L28.6136986,19.7944444 L28.7561644,19.7222222 C34.8438356,16.6388889 39.2383562,11.3888889 39.7150685,8.98333333 C40.1066873,7.18276937 39.7712415,5.29818875 38.7835616,3.75 Z M11.2493151,19.0888889 C5.40273973,16.0833333 1.2109589,11.1166667 0.761643836,8.85 C0.408140766,7.21152091 0.711268394,5.4977698 1.60430787,4.08594586 C2.49734735,2.67412193 3.90710379,1.67994043 5.52328767,1.32222222 C5.95522389,1.22613421 6.39614516,1.17770432 6.83835616,1.17777778 C8.396658,1.18368621 9.89692195,1.77786627 11.0465753,2.84444444 L11.2547945,3.03333333 L11.4630137,2.84444444 C13.6896847,0.766175918 17.07058,0.62060959 19.4630137,2.5 C19.0788115,2.87369746 18.7386406,3.29130068 18.4493151,3.74444444 C17.4644144,5.29171547 17.1309637,7.17417158 17.5232877,8.97222222 C17.6986301,9.86111111 18.4109589,11.1388889 19.539726,12.55 C17.2109396,15.2436943 14.3973082,17.4628874 11.2493151,19.0888889 L11.2493151,19.0888889 Z M20.8931507,4.08888889 C21.7894295,5.50042901 22.0913233,7.21691546 21.7315068,8.85555556 C21.3658775,10.0484615 20.7510092,11.1474788 19.9287671,12.0777778 C19.1061255,11.1456527 18.4912565,10.0447392 18.1260274,8.85 C17.7687265,7.21239463 18.0725913,5.49792066 18.969863,4.08888889 C19.2436642,3.6602523 19.5674644,3.26666848 19.9342466,2.91666667 C20.3006463,3.26497888 20.6244292,3.65667654 20.8986301,4.08333333 L20.8931507,4.08888889 Z M39.1013699,8.85555556 C38.6575342,11.1166667 34.4657534,16.0777778 28.6136986,19.0888889 C25.4659544,17.4648807 22.6522953,15.2475512 20.3232877,12.5555556 C21.4520548,11.1444444 22.1643836,9.86666667 22.339726,8.98333333 C22.7329547,7.1835087 22.3994921,5.29898427 21.4136986,3.75 C21.1264291,3.29520782 20.7880947,2.87573762 20.4054795,2.5 C21.1375201,1.92393104 21.9875649,1.52148079 22.8931507,1.32222222 C23.3232976,1.22653172 23.7623606,1.17810415 24.2027397,1.17777778 C25.7610416,1.18368621 27.2613055,1.77786627 28.4109589,2.84444444 L28.6191781,3.03333333 L28.8273973,2.84444444 C30.8303846,0.993874407 33.784067,0.669774842 36.1311698,2.04302126 C38.4782727,3.41626768 39.6794365,6.17129081 39.1013699,8.85555556 Z" stroke="currentColor" stroke-width="0.3"></path>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="event-main">
+          <h4 class="event-title">Traditional Ceremony</h4>
+          <p class="event-time">6:00 PM</p>
+        </div>
+        <div class="event-divider"></div>
+        <div class="event-details">
+          <p class="event-venue">D'Vine Grace Vineyard</p>
+          <p class="event-address">
+            <a href="https://www.google.com/maps/search/?api=1&query=3747+Grace+Ranch+Trl+McKinney+TX+75071" target="_blank">
+              3747 Grace Ranch Trl, McKinney, TX 75071
+            </a>
+          </p>
+          <p class="event-color-day"><strong>Color of the Day:</strong> Burnt Orange and Bronze</p>
+          <div class="event-actions">
+            <a href="https://www.google.com/maps/search/?api=1&query=3747+Grace+Ranch+Trl+McKinney+TX+75071" target="_blank" class="btn-action outline">Map</a>
+            <button class="btn-action" onclick="addToCalendar('Traditional Ceremony', '2026-05-28', '18:00', 'D\'Vine Grace Vineyard, 3747 Grace Ranch Trl, McKinney, TX 75071')">Add to Calendar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saturday, May 30 -->
+  <div class="date-section">
+    <h3 class="date-header">Saturday, May 30, 2026</h3>
+    
+    <div class="event-timeline">
+      <div class="event-row">
+        <div class="event-icon">
+          <svg viewBox="0 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <g id="wedding_rings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g transform="translate(15.000000, 24.000000)" fill="currentColor" fill-rule="nonzero">
+                <path d="M38.7835616,3.75 C37.7226303,2.06794594 35.9975187,0.931758426 34.0504935,0.63272183 C32.1034683,0.333685233 30.123859,0.900877982 28.6191781,2.18888889 C26.1239185,0.046173077 22.4794493,0.00187866083 19.9342466,2.08333333 C17.3890439,0.00187866083 13.7445747,0.046173077 11.2493151,2.18888889 C9.00759192,0.278560224 5.81550157,0.025972582 3.30860308,1.56054649 C0.801704594,3.0951204 -0.464444302,6.07677651 0.15890411,8.97777778 C0.630136986,11.3888889 5.02465753,16.6333333 11.1123288,19.7222222 L11.2493151,19.7944444 L11.3863014,19.7222222 C14.6323011,18.0641668 17.5341398,15.7896647 19.9342466,13.0222222 C22.332551,15.7893011 25.232528,18.063802 28.4767123,19.7222222 L28.6136986,19.7944444 L28.7561644,19.7222222 C34.8438356,16.6388889 39.2383562,11.3888889 39.7150685,8.98333333 C40.1066873,7.18276937 39.7712415,5.29818875 38.7835616,3.75 Z M11.2493151,19.0888889 C5.40273973,16.0833333 1.2109589,11.1166667 0.761643836,8.85 C0.408140766,7.21152091 0.711268394,5.4977698 1.60430787,4.08594586 C2.49734735,2.67412193 3.90710379,1.67994043 5.52328767,1.32222222 C5.95522389,1.22613421 6.39614516,1.17770432 6.83835616,1.17777778 C8.396658,1.18368621 9.89692195,1.77786627 11.0465753,2.84444444 L11.2547945,3.03333333 L11.4630137,2.84444444 C13.6896847,0.766175918 17.07058,0.62060959 19.4630137,2.5 C19.0788115,2.87369746 18.7386406,3.29130068 18.4493151,3.74444444 C17.4644144,5.29171547 17.1309637,7.17417158 17.5232877,8.97222222 C17.6986301,9.86111111 18.4109589,11.1388889 19.539726,12.55 C17.2109396,15.2436943 14.3973082,17.4628874 11.2493151,19.0888889 L11.2493151,19.0888889 Z M20.8931507,4.08888889 C21.7894295,5.50042901 22.0913233,7.21691546 21.7315068,8.85555556 C21.3658775,10.0484615 20.7510092,11.1474788 19.9287671,12.0777778 C19.1061255,11.1456527 18.4912565,10.0447392 18.1260274,8.85 C17.7687265,7.21239463 18.0725913,5.49792066 18.969863,4.08888889 C19.2436642,3.6602523 19.5674644,3.26666848 19.9342466,2.91666667 C20.3006463,3.26497888 20.6244292,3.65667654 20.8986301,4.08333333 L20.8931507,4.08888889 Z M39.1013699,8.85555556 C38.6575342,11.1166667 34.4657534,16.0777778 28.6136986,19.0888889 C25.4659544,17.4648807 22.6522953,15.2475512 20.3232877,12.5555556 C21.4520548,11.1444444 22.1643836,9.86666667 22.339726,8.98333333 C22.7329547,7.1835087 22.3994921,5.29898427 21.4136986,3.75 C21.1264291,3.29520782 20.7880947,2.87573762 20.4054795,2.5 C21.1375201,1.92393104 21.9875649,1.52148079 22.8931507,1.32222222 C23.3232976,1.22653172 23.7623606,1.17810415 24.2027397,1.17777778 C25.7610416,1.18368621 27.2613055,1.77786627 28.4109589,2.84444444 L28.6191781,3.03333333 L28.8273973,2.84444444 C30.8303846,0.993874407 33.784067,0.669774842 36.1311698,2.04302126 C38.4782727,3.41626768 39.6794365,6.17129081 39.1013699,8.85555556 Z" stroke="currentColor" stroke-width="0.3"></path>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="event-main">
+          <h4 class="event-title">Wedding Ceremony</h4>
+          <p class="event-time">12:00 PM</p>
+        </div>
+        <div class="event-divider"></div>
+        <div class="event-details">
+          <p class="event-venue">Plano Prestonwood Baptist</p>
+          <p class="event-address">
+            <a href="https://www.google.com/maps/search/?api=1&query=6801+W+Park+Blvd+Plano+TX+75093" target="_blank">
+              6801 W Park Blvd, Plano, TX 75093
+            </a>
+          </p>
+          <p class="event-color-day"><strong>Color of the Day:</strong> Turquoise and Blush Pink</p>
+          <div class="event-actions">
+            <a href="https://www.google.com/maps/search/?api=1&query=6801+W+Park+Blvd+Plano+TX+75093" target="_blank" class="btn-action outline">Map</a>
+            <button class="btn-action" onclick="addToCalendar('Wedding Ceremony', '2026-05-30', '12:00', 'Plano Prestonwood Baptist, 6801 W Park Blvd, Plano, TX 75093')">Add to Calendar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-timeline">
+      <div class="event-row">
+        <div class="event-icon">
+          <svg viewBox="0 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <g id="wedding_rings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g transform="translate(15.000000, 24.000000)" fill="currentColor" fill-rule="nonzero">
+                <path d="M38.7835616,3.75 C37.7226303,2.06794594 35.9975187,0.931758426 34.0504935,0.63272183 C32.1034683,0.333685233 30.123859,0.900877982 28.6191781,2.18888889 C26.1239185,0.046173077 22.4794493,0.00187866083 19.9342466,2.08333333 C17.3890439,0.00187866083 13.7445747,0.046173077 11.2493151,2.18888889 C9.00759192,0.278560224 5.81550157,0.025972582 3.30860308,1.56054649 C0.801704594,3.0951204 -0.464444302,6.07677651 0.15890411,8.97777778 C0.630136986,11.3888889 5.02465753,16.6333333 11.1123288,19.7222222 L11.2493151,19.7944444 L11.3863014,19.7222222 C14.6323011,18.0641668 17.5341398,15.7896647 19.9342466,13.0222222 C22.332551,15.7893011 25.232528,18.063802 28.4767123,19.7222222 L28.6136986,19.7944444 L28.7561644,19.7222222 C34.8438356,16.6388889 39.2383562,11.3888889 39.7150685,8.98333333 C40.1066873,7.18276937 39.7712415,5.29818875 38.7835616,3.75 Z M11.2493151,19.0888889 C5.40273973,16.0833333 1.2109589,11.1166667 0.761643836,8.85 C0.408140766,7.21152091 0.711268394,5.4977698 1.60430787,4.08594586 C2.49734735,2.67412193 3.90710379,1.67994043 5.52328767,1.32222222 C5.95522389,1.22613421 6.39614516,1.17770432 6.83835616,1.17777778 C8.396658,1.18368621 9.89692195,1.77786627 11.0465753,2.84444444 L11.2547945,3.03333333 L11.4630137,2.84444444 C13.6896847,0.766175918 17.07058,0.62060959 19.4630137,2.5 C19.0788115,2.87369746 18.7386406,3.29130068 18.4493151,3.74444444 C17.4644144,5.29171547 17.1309637,7.17417158 17.5232877,8.97222222 C17.6986301,9.86111111 18.4109589,11.1388889 19.539726,12.55 C17.2109396,15.2436943 14.3973082,17.4628874 11.2493151,19.0888889 L11.2493151,19.0888889 Z M20.8931507,4.08888889 C21.7894295,5.50042901 22.0913233,7.21691546 21.7315068,8.85555556 C21.3658775,10.0484615 20.7510092,11.1474788 19.9287671,12.0777778 C19.1061255,11.1456527 18.4912565,10.0447392 18.1260274,8.85 C17.7687265,7.21239463 18.0725913,5.49792066 18.969863,4.08888889 C19.2436642,3.6602523 19.5674644,3.26666848 19.9342466,2.91666667 C20.3006463,3.26497888 20.6244292,3.65667654 20.8986301,4.08333333 L20.8931507,4.08888889 Z M39.1013699,8.85555556 C38.6575342,11.1166667 34.4657534,16.0777778 28.6136986,19.0888889 C25.4659544,17.4648807 22.6522953,15.2475512 20.3232877,12.5555556 C21.4520548,11.1444444 22.1643836,9.86666667 22.339726,8.98333333 C22.7329547,7.1835087 22.3994921,5.29898427 21.4136986,3.75 C21.1264291,3.29520782 20.7880947,2.87573762 20.4054795,2.5 C21.1375201,1.92393104 21.9875649,1.52148079 22.8931507,1.32222222 C23.3232976,1.22653172 23.7623606,1.17810415 24.2027397,1.17777778 C25.7610416,1.18368621 27.2613055,1.77786627 28.4109589,2.84444444 L28.6191781,3.03333333 L28.8273973,2.84444444 C30.8303846,0.993874407 33.784067,0.669774842 36.1311698,2.04302126 C38.4782727,3.41626768 39.6794365,6.17129081 39.1013699,8.85555556 Z" stroke="currentColor" stroke-width="0.3"></path>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="event-main">
+          <h4 class="event-title">Wedding Reception</h4>
+          <p class="event-time">4:00 PM</p>
+        </div>
+        <div class="event-divider"></div>
+        <div class="event-details">
+          <p class="event-venue">The Crown Venue</p>
+          <p class="event-address">
+            <a href="https://www.google.com/maps/search/?api=1&query=10841+Composite+Drive+Dallas+TX+75220" target="_blank">
+              10841 Composite Drive, Dallas, TX 75220
+            </a>
+          </p>
+          <p class="event-color-day"><strong>Color of the Day:</strong> Turquoise and Blush Pink</p>
+          <div class="event-actions">
+            <a href="https://www.google.com/maps/search/?api=1&query=10841+Composite+Drive+Dallas+TX+75220" target="_blank" class="btn-action outline">Map</a>
+            <button class="btn-action" onclick="addToCalendar('Wedding Reception', '2026-05-30', '16:00', 'The Crown Venue, 10841 Composite Drive, Dallas, TX 75220')">Add to Calendar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  With love, Toluwani & Temilola 💕
+</footer>
+
+<script src="../js/music-player.js"></script>
+
+<script>
+function addToCalendar(title, date, time, location) {
+  // Create ICS format event
+  const [year, month, day] = date.split('-');
+  const [hours, minutes] = time.split(':');
+  
+  const startTime = `${year}${month}${day}T${hours}${minutes}00`;
+  const endTime = `${year}${month}${day}T${parseInt(hours) + 2}${minutes}00`;
+  
+  const ics = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Toluwani & Temilola Wedding//EN
+BEGIN:VEVENT
+UID:${Math.random().toString(36).substr(2, 9)}@wedding.com
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART:${startTime}
+DTEND:${endTime}
+SUMMARY:${title}
+LOCATION:${location}
+DESCRIPTION:Toluwani & Temilola's Wedding Event
+END:VEVENT
+END:VCALENDAR`;
+
+  // Create download link
+  const element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(ics));
+  element.setAttribute('download', `${title.replace(/\s+/g, '_')}.ics`);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+</script>
