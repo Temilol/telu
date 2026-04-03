@@ -1,5 +1,6 @@
 html {
   overscroll-behavior-y: none;
+  height: 100%;
 }
 
 :root {
@@ -17,6 +18,9 @@ body {
   color: var(--color-text);
   background-color: var(--color-bg);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 /* Side Images */
@@ -83,11 +87,34 @@ header p {
 }
 
 .breadcrumb {
-  max-width: 800px;
-  margin: 20px auto 0;
+  max-width: 100%;
+  margin: 20px 0 0 0;
   padding: 0 20px;
+  margin-left: 250px;
+  margin-right: 250px;
   font-size: 0.9rem;
   color: #666;
+}
+
+@media (max-width: 1400px) {
+  .breadcrumb {
+    margin-left: 100px;
+    margin-right: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .breadcrumb {
+    margin-left: 80px;
+    margin-right: 80px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .breadcrumb {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 .breadcrumb a {
@@ -106,10 +133,33 @@ header p {
 }
 
 .section-wrapper {
-  max-width: 800px;
-  margin: 40px auto;
+  max-width: 100%;
+  margin: 40px 0;
   padding: 0 20px;
-  min-height: 60vh;
+  flex-grow: 1;
+  margin-left: 250px;
+  margin-right: 250px;
+}
+
+@media (max-width: 1400px) {
+  .section-wrapper {
+    margin-left: 100px;
+    margin-right: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .section-wrapper {
+    margin-left: 80px;
+    margin-right: 80px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .section-wrapper {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 /* Search Section */

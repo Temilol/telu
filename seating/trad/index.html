@@ -3,120 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>Toluwani & Temilola — Seating Chart (Traditional)</title>
+  <title>Toluwani & Temilola — Find Your Seat (Traditional)</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../../logo.png" />
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../css/seating-shared.css">
+  <link rel="stylesheet" href="../../css/seating-find-seat.css">
 </head>
 <body>
 
 <header>
-  <h1>Seating Chart Editor</h1>
-  <p>Traditional Wedding Reception</p>
+  <h1>Toluwani & Temilola</h1>
+  <p>Traditional Wedding Reception - Search for Your Table Assignment</p>
 </header>
 
 <nav class="breadcrumb">
   <a href="../index.html">Seating</a>
   <span>›</span>
-  <span>Traditional Reception</span>
-  <span style="margin-left: 15px;">|</span>
-  <a href="find-seat.html" style="margin-left: 15px;">🔍 Find Your Seat</a>
-  <span style="margin-left: 15px;">|</span>
-  <a href="view.html" style="margin-left: 15px;">👁️ View Seating Chart</a>
+  <span>Find Your Seat</span>
   <span style="margin-left: 15px;">|</span>
   <a href="../white/index.html" style="margin-left: 15px;">📅 White Reception</a>
 </nav>
 
 <section class="section-wrapper">
-  
-  <!-- Admin Controls -->
-  <div class="admin-controls">
-    <h2>Table Management</h2>
-    <div class="control-buttons">
-      <button id="addTableBtn" class="control-btn primary-btn">
-        ➕ Add New Table
-      </button>
-      <button id="clearBtn" class="control-btn danger-btn">
-        🗑️ Clear All Tables
-      </button>
-    </div>
-    <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666; border-top: 1px solid var(--color-secondary); padding-top: 15px;">☁️ All changes are automatically saved and synced across devices!</p>
-    <p style="text-align: center; margin-top: 10px; font-size: 0.85rem; color: #666;">💡 <strong>Tip:</strong> Drag tables to move • Hover for edit/delete buttons</p>
-  </div>
-
-  <!-- Visual Seating Chart -->
-  <div class="chart-section">
-    <h2>Reception Floor Plan</h2>
+  <!-- Search Section -->
+  <div class="search-section">
+    <h2>Find Your Table</h2>
+    <p>Enter your name to see your table assignment</p>
     
-    <div class="venue-container" id="venueContainer">
-      <!-- Zoom Controls -->
-      <div class="zoom-controls">
-        <button class="zoom-btn" id="zoomInBtn" title="Zoom In">+</button>
-        <div class="zoom-level" id="zoomLevel">100%</div>
-        <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">−</button>
-        <button class="zoom-btn" id="zoomResetBtn" title="Reset Zoom" style="font-size: 1rem;">⟲</button>
-        <button class="zoom-btn" id="fullscreenBtn" title="Fullscreen" style="font-size: 1.2rem;">⛶</button>
-      </div>
+    <div class="search-box">
+      <input 
+        type="text" 
+        id="guestSearch" 
+        class="search-input" 
+        placeholder="Enter your name..."
+        autocomplete="off"
+      />
+      <span class="search-icon">🔎</span>
+    </div>
 
-      <!-- Floating Add Table Button (only visible in fullscreen) -->
-      <button class="floating-add-btn" id="floatingAddBtn" title="Add New Table">
-        ➕
-      </button>
+    <div id="searchResult" class="search-result">
+      <div class="result-name" id="resultName"></div>
+      <div class="result-info" id="resultTable"></div>
+      <div class="result-tablemates" id="resultTablemates"></div>
+    </div>
 
-      <!-- Venue Map with spatial table positioning -->
-      <div id="venueMap" class="venue-map">
-        <!-- Head Table -->
-        <div class="head-table" id="headTable">
-          👰🤵 The Couple
-        </div>
-        
-        <!-- Dance Floor -->
-        <div class="dance-floor" id="danceFloor">
-          🎵 Dance Floor 🎵
-        </div>
-        <!-- Tables will be dynamically positioned by JavaScript -->
-      </div>
-
-      <!-- Modal for Add/Edit Table (inside container for fullscreen access) -->
-      <div id="tableModal" class="modal">
-        <div class="modal-content">
-          <h2 class="modal-header" id="modalTitle">Add New Table</h2>
-          <form id="tableForm">
-            <div class="form-group">
-              <label for="tableNumber">Table Number</label>
-              <input type="number" id="tableNumber" required min="1">
-              <small id="tableNumberError" style="color: #d32f2f; display: none; margin-top: 5px;">This table number already exists</small>
-            </div>
-            <div class="form-group">
-              <label for="guestSearch">Search & Add Guests</label>
-              <input 
-                type="text" 
-                id="guestSearch" 
-                placeholder="Type guest name to search..." 
-                autocomplete="off"
-              >
-              <div id="searchSuggestions" class="search-suggestions"></div>
-            </div>
-            <div class="form-group">
-              <label>Selected Guests</label>
-              <div id="selectedGuestsTags" class="guest-tags-container"></div>
-              <small style="color: #888; display: block; margin-top: 8px;">Click an 'X' to remove a guest</small>
-            </div>
-            <div class="form-actions">
-              <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
-              <button type="submit" class="btn-save">Save Table</button>
-            </div>
-          </form>
-        </div>
-      </div>
+    <div id="noResult" class="no-result">
+      <strong>No guest found with that name.</strong> Please check your spelling or contact us if you believe this is an error.
     </div>
   </div>
+
 </section>
 
 <footer>
@@ -126,17 +63,15 @@
 
 <!-- Firebase SDK -->
 <script type="module" src="../../js/firebase-init.js"></script>
+
 <script>
-  // Set event ID for this page
+  // Set event ID for traditional wedding reception
   window.currentEventId = "wedding-seating-chart-trad";
 </script>
 
-<script src="../../js/rsvp.js"></script>
 <script src="../../js/seating-chart.js"></script>
-<script src="../../js/firebase-guests.js"></script>
-<script src="../../js/seating-admin.js"></script>
-<script src="../../js/zoom-controls.js"></script>
 <script src="../../js/firebase-seating.js"></script>
+<script src="../../js/seating-find-seat.js"></script>
 
 </body>
 </html>
