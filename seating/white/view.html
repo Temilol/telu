@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Toluwani & Temilola — Seating Chart View (White)</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/seating-shared.css">
+</head>
+<body>
+
+<header>
+  <h1>Seating Chart</h1>
+  <p>White Wedding Reception</p>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <div>
+      <a href="index.html" class="btn btn-secondary">✏️ Edit Seating</a>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="exportSeatingChartAsSVG()">📥 Export as SVG</button>
+      <button class="btn btn-primary" onclick="window.print()" style="margin-left: 10px;">📄 Export as PDF</button>
+    </div>
+  </div>
+
+  <div id="content" class="loading">Loading seating chart...</div>
+</div>
+
+<!-- Seating Chart Export -->
+<script src="../../js/seating-chart-export.js"></script>
+
+<!-- Firebase SDK -->
+<script type="module" src="../../js/firebase-init.js"></script>
+
+<script>
+  // Set event ID for this page
+  window.currentEventId = "wedding-seating-chart-white";
+</script>
+
+<!-- Shared seating view logic -->
+<script src="../../js/seating-view.js"></script>
+
+</body>
+</html>

@@ -33,7 +33,7 @@ const firebaseConfig = {
   projectId: "your-project-id",
   storageBucket: "your-project.appspot.com",
   messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
+  appId: "1:123456789:web:abc123",
 };
 ```
 
@@ -45,6 +45,7 @@ const firebaseConfig = {
 4. Save the file
 
 The section looks like this:
+
 ```javascript
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -52,7 +53,7 @@ const firebaseConfig = {
   projectId: "YOUR_PROJECT_ID",
   storageBucket: "YOUR_PROJECT_ID.appspot.com",
   messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  appId: "YOUR_APP_ID",
 };
 ```
 
@@ -80,6 +81,7 @@ service cloud.firestore {
 4. Click "Publish"
 
 ⚠️ **Security Note**: The above rules allow anyone to read and write. For production:
+
 - Consider adding Firebase Authentication
 - Restrict write access to authenticated admin users only
 - Keep read access open for guest search functionality
@@ -102,21 +104,23 @@ service cloud.firestore {
   - Clear all tables
 
 - You'll see a green notification when data is saved
-- If Firebase is not configured or unreachable, the chart will fall back to loading from `seating-data.json`
 
 ## Troubleshooting
 
 ### Configuration not working?
+
 - Check browser console (F12) for Firebase errors
 - Verify your config values are correct (no quotes around values inside the object)
 - Make sure Firestore is enabled in your Firebase project
 
 ### Data not persisting?
+
 - Check Firestore rules are set correctly
 - Look at "Firestore Database" in Firebase Console to see if data is being saved
 - The document should appear under: `seating-charts/wedding-seating-chart`
 
 ### Need to reset everything?
+
 - Go to Firestore Database in Firebase Console
 - Delete the `wedding-seating-chart` document
 - Refresh your webpage

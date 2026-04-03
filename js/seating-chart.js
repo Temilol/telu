@@ -1,28 +1,10 @@
 // Seating Chart Data
-// Data is loaded from seating-data.json file
+// Data is loaded from Firebase
 let seatingData = {
   tables: [],
   headTable: { x: 50, y: 8 },
   danceFloor: { x: 50, y: 92 },
 };
-
-// Load seating data from JSON file
-async function loadSeatingData() {
-  try {
-    const response = await fetch("../seating-data.json");
-    if (!response.ok) {
-      throw new Error("Failed to load seating data");
-    }
-    const data = await response.json();
-    seatingData = data;
-    return true;
-  } catch (error) {
-    console.error("Error loading seating data:", error);
-    // Use default/empty data if file doesn't exist
-    seatingData = { tables: [] };
-    return false;
-  }
-}
 
 // Create a flattened guest lookup for easy searching
 const guestLookup = {};
@@ -52,15 +34,9 @@ window.updateGuestLookup = updateGuestLookup;
 
 // Initialize the page
 document.addEventListener("DOMContentLoaded", async function () {
-  // Try to load from Firebase first, then fall back to JSON file
-  let loaded = false;
-
+  // Load seating data from Firebase
   if (window.firebaseInitialized && typeof loadFromFirebase === "function") {
-    loaded = await loadFromFirebase();
-  }
-
-  if (!loaded) {
-    await loadSeatingData();
+    await loadFromFirebase();
   }
 
   // Update guest lookup after data is loaded

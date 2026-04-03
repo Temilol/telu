@@ -1,9 +1,24 @@
 // Firebase integration for guest management
 // Handles loading and syncing guest data from Firestore
+// Supports separate guest collections for different events (trad, white)
 
-const FIREBASE_GUESTS_COLLECTION = "guests";
+// Determine which collection to use based on the current event
+function getGuestCollectionName() {
+  if (typeof window.currentEventId === "undefined") {
+    console.warn("⚠️  currentEventId not set, using default collection");
+    return "guests";
+  }
 
-// Fetch all guests from Firebase
+  if (window.currentEventId.includes("trad")) {
+    return "guests_trad";
+  } else if (window.currentEventId.includes("white")) {
+    return "guests_white";
+  }
+
+  return "guests";
+}
+
+// Fetch all guests from Firebase for the current event
 async function loadGuestsFromFirebase() {
   if (!window.firebaseInitialized) {
     console.log("Firebase not initialized, using fallback guests");
@@ -11,22 +26,29 @@ async function loadGuestsFromFirebase() {
   }
 
   try {
+    const collectionName = getGuestCollectionName();
+    console.log(`📍 Loading guests from collection: ${collectionName}`);
+
     const querySnapshot = await window.firebaseGetDocs(
-      window.firebaseCollection(window.firebaseDB, FIREBASE_GUESTS_COLLECTION)
+      window.firebaseCollection(window.firebaseDB, collectionName),
     );
 
     const guests = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      
-      // Add primary guest
+
+      // Add guest
       guests.push({
         id: doc.id,
         name: data.name || "",
+        title: data.title || "",
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        event: data.event || "",
         ...data,
       });
 
-      // Add additional guests (plus-ones) as separate entries
+      // Add additional guests (plus-ones) as separate entries if they exist
       if (data.additionalGuests && Array.isArray(data.additionalGuests)) {
         data.additionalGuests.forEach((additionalName) => {
           guests.push({
@@ -41,7 +63,9 @@ async function loadGuestsFromFirebase() {
 
     // Sort by name
     guests.sort((a, b) => a.name.localeCompare(b.name));
-    console.log(`✓ Loaded ${guests.length} guests from Firebase`);
+    console.log(
+      `✓ Loaded ${guests.length} guests from Firebase (${collectionName})`,
+    );
     return guests;
   } catch (error) {
     console.error("Error loading guests from Firebase:", error);
@@ -50,7 +74,8 @@ async function loadGuestsFromFirebase() {
 }
 
 // Upload guests to Firebase (one-time migration)
-async function uploadGuestsToFirebase(guests) {
+// Supports uploading to event-specific collections
+async function uploadGuestsToFirebase(guests, eventName = "trad") {
   if (!window.firebaseInitialized) {
     console.error("❌ Firebase not initialized");
     alert("Firebase not initialized");
@@ -63,33 +88,48 @@ async function uploadGuestsToFirebase(guests) {
     return false;
   }
 
+  const collectionName =
+    eventName === "trad"
+      ? "guests_trad"
+      : eventName === "white"
+        ? "guests_white"
+        : "guests";
+
   try {
-    console.log(`Starting upload of ${guests.length} guests...`);
-    
+    console.log(
+      `Starting upload of ${guests.length} guests to ${collectionName}...`,
+    );
+
     for (const guest of guests) {
       const guestName = `${guest.firstName} ${guest.lastName}`.trim();
       const docId = guestName.toLowerCase().replace(/\s+/g, "-");
-      
+
       const docRef = window.firebaseDoc(
         window.firebaseDB,
-        FIREBASE_GUESTS_COLLECTION,
-        docId
+        collectionName,
+        docId,
       );
 
       await window.firebaseSetDoc(docRef, {
         name: guestName,
         firstName: guest.firstName,
         lastName: guest.lastName,
+        title: guest.title || "",
+        event: eventName,
         partySize: guest.partySize || 1,
         plusOne: guest.plusOne || false,
         additionalGuests: guest.additionalGuests || [],
       });
-      
+
       console.log(`✓ Uploaded: ${guestName}`);
     }
 
-    console.log(`✅ Successfully uploaded ${guests.length} guests to Firebase`);
-    alert(`✅ Successfully uploaded ${guests.length} guests to Firebase!`);
+    console.log(
+      `✅ Successfully uploaded ${guests.length} guests to ${collectionName}`,
+    );
+    alert(
+      `✅ Successfully uploaded ${guests.length} guests to ${collectionName}!`,
+    );
     return true;
   } catch (error) {
     console.error("❌ Error uploading guests to Firebase:", error);
@@ -152,9 +192,7 @@ function getAssignedGuests(tables) {
 // Get available guests (not yet assigned)
 function getAvailableGuests(allGuests, tables) {
   const assigned = getAssignedGuests(tables);
-  return allGuests.filter(
-    (guest) => !assigned.has(guest.name.toLowerCase())
-  );
+  return allGuests.filter((guest) => !assigned.has(guest.name.toLowerCase()));
 }
 
 // Check if guest is already assigned
