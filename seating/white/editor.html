@@ -105,6 +105,11 @@
               <small id="tableNumberError" style="color: #d32f2f; display: none; margin-top: 5px;">This table number already exists</small>
             </div>
             <div class="form-group">
+              <label for="tableMaxGuests">Max Guests</label>
+              <input type="number" id="tableMaxGuests" value="10" min="1" max="20" required>
+              <small style="color: #888; display: block; margin-top: 5px;">Maximum number of guests for this table</small>
+            </div>
+            <div class="form-group">
               <label for="guestSearch">Search & Add Guests</label>
               <input 
                 type="text" 
@@ -115,9 +120,9 @@
               <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
             <div class="form-group">
-              <label>Selected Guests</label>
+              <label>Selected Guests <span id="guestCountDisplay" style="float: right; font-weight: normal; color: #888;">0/10 guests</span></label>
               <div id="selectedGuestsTags" class="guest-tags-container"></div>
-              <small style="color: #888; display: block; margin-top: 8px;">Click an 'X' to remove a guest</small>
+              <small id="guestFootnote" style="color: #888; display: block; margin-top: 8px;">Click an 'X' to remove a guest • Max 10 per table</small>
             </div>
             <div class="form-actions">
               <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>

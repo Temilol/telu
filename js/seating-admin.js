@@ -1,7 +1,9 @@
 // Admin functions for managing seating chart
 // This file handles add, edit, delete table functionality
 
+const DEFAULT_MAX_GUESTS = 10; // Default max guests per table
 let allGuests = []; // Cache for guest list
+let currentTableMaxGuests = DEFAULT_MAX_GUESTS; // Track current table's max
 
 // Initialize admin controls
 document.addEventListener("DOMContentLoaded", function () {
@@ -90,6 +92,13 @@ async function openModal(tableNumber = null) {
       modalTitle.textContent = `Edit Table ${tableNumber}`;
       tableNumberInput.value = table.number;
       tableNumberInput.disabled = true;
+      
+      // Set max guests for this table
+      const maxGuestsInput = document.getElementById('tableMaxGuests');
+      if (maxGuestsInput) {
+        maxGuestsInput.value = table.maxGuests || DEFAULT_MAX_GUESTS;
+        currentTableMaxGuests = table.maxGuests || DEFAULT_MAX_GUESTS;
+      }
 
       // Store original guests for change detection
       originalGuests = [...table.guests];
@@ -99,6 +108,7 @@ async function openModal(tableNumber = null) {
         selectedGuestsMap.set(guestName.toLowerCase(), guestName);
         addGuestTag(guestName, selectedGuestsMap, tagsContainer);
       });
+      updateGuestCountDisplay(selectedGuestsMap);
 
       // Disable save button initially in edit mode
       disableSaveButton();
@@ -109,7 +119,13 @@ async function openModal(tableNumber = null) {
     modalTitle.textContent = "Add New Table";
     tableNumberInput.value = getNextTableNumber();
     tableNumberInput.disabled = false;
-    originalGuests = [];
+    currentTableMaxGuests = DEFAULT_MAX_GUESTS;
+    
+    // Set default max guests
+    const maxGuestsInput = document.getElementById('tableMaxGuests');
+    if (maxGuestsInput) {
+      maxGuestsInput.value = DEFAULT_MAX_GUESTS;
+    }
 
     // Add real-time validation for table number
     tableNumberInput.addEventListener("change", function () {
@@ -117,6 +133,42 @@ async function openModal(tableNumber = null) {
     });
   }
 
+  // Add listener for max guests input to update limit in real-time
+  const maxGuestsInput = document.getElementById('tableMaxGuests');
+  if (maxGuestsInput) {
+    let previousMax = currentTableMaxGuests;
+    
+    maxGuestsInput.addEventListener('change', function () {
+      const newMax = parseInt(this.value) || DEFAULT_MAX_GUESTS;
+      
+      // Check if new max is below current guest count
+      if (newMax < selectedGuestsMap.size) {
+        alert(`You have ${selectedGuestsMap.size} guests selected, but max is now ${newMax}. Please remove ${selectedGuestsMap.size - newMax} guest(s) first.`);
+        // Reset input back to previous max
+        this.value = previousMax;
+        return;
+      }
+      
+      currentTableMaxGuests = newMax;
+      previousMax = newMax;
+      updateGuestCountDisplay(selectedGuestsMap);
+    });
+    
+    maxGuestsInput.addEventListener('input', function () {
+      const newMax = parseInt(this.value) || DEFAULT_MAX_GUESTS;
+      if (newMax > 0) {
+        // Only update if it won't conflict with current guests
+        if (newMax >= selectedGuestsMap.size) {
+          currentTableMaxGuests = newMax;
+          updateGuestCountDisplay(selectedGuestsMap);
+        }
+      }
+    });
+  }
+
+  // Display guest count
+  updateGuestCountDisplay(selectedGuestsMap);
+  
   // Remove old event listeners by cloning
   const newSearchInput = guestSearchInput.cloneNode(true);
   guestSearchInput.parentNode.replaceChild(newSearchInput, guestSearchInput);
@@ -166,9 +218,15 @@ async function openModal(tableNumber = null) {
       updatedSuggestionsDiv.querySelectorAll(".suggestion-item:not(.disabled)").forEach((item) => {
         item.style.cursor = "pointer";
         item.addEventListener("click", function () {
+          // Check if at max capacity
+          if (selectedGuestsMap.size >= currentTableMaxGuests) {
+            alert(`Maximum ${currentTableMaxGuests} guests per table reached!`);
+            return;
+          }
           const guestName = this.dataset.guestName;
           selectedGuestsMap.set(guestName.toLowerCase(), guestName);
           addGuestTag(guestName, selectedGuestsMap, tagsContainer);
+          updateGuestCountDisplay(selectedGuestsMap);
           updatedSearchInput.value = "";
           updatedSuggestionsDiv.innerHTML = "";
           updatedSuggestionsDiv.classList.remove("show");
@@ -178,6 +236,11 @@ async function openModal(tableNumber = null) {
       updatedSuggestionsDiv.innerHTML = '<div class="suggestion-item" style="opacity: 0.6;">No available guests</div>';
       updatedSuggestionsDiv.classList.add("show");
     }
+  });
+  
+  // Update count display on input changes
+  updatedSearchInput.addEventListener("change", () => {
+    updateGuestCountDisplay(selectedGuestsMap);
   });
 
   modal.classList.add("show");
@@ -207,6 +270,8 @@ function addGuestTag(guestName, selectedGuestsMap, tagsContainer) {
       tagsContainer.classList.add("empty");
       tagsContainer.textContent = "No guests selected";
     }
+    
+    updateGuestCountDisplay(selectedGuestsMap);
 
     // Check if anything changed for edit mode
     if (currentModalMode === "edit") {
@@ -219,6 +284,42 @@ function addGuestTag(guestName, selectedGuestsMap, tagsContainer) {
   // Check if anything changed for edit mode
   if (currentModalMode === "edit") {
     checkForChanges(selectedGuestsMap);
+  }
+}
+
+// Update guest count display
+function updateGuestCountDisplay(selectedGuestsMap) {
+  const countDisplay = document.getElementById('guestCountDisplay');
+  const footnote = document.getElementById('guestFootnote');
+  const searchInput = document.getElementById('guestSearch');
+  const currentCount = selectedGuestsMap.size;
+  const isAtLimit = currentCount >= currentTableMaxGuests;
+  
+  if (countDisplay) {
+    countDisplay.textContent = `${currentCount}/${currentTableMaxGuests} guests`;
+    if (isAtLimit) {
+      countDisplay.style.color = '#d32f2f';
+      countDisplay.style.fontWeight = 'bold';
+    } else {
+      countDisplay.style.color = '#888';
+      countDisplay.style.fontWeight = 'normal';
+    }
+  }
+  
+  if (footnote) {
+    footnote.textContent = `Click an 'X' to remove a guest • Max ${currentTableMaxGuests} per table`;
+  }
+  
+  if (searchInput) {
+    if (isAtLimit) {
+      searchInput.disabled = true;
+      searchInput.placeholder = `Maximum ${currentTableMaxGuests} guests reached`;
+      searchInput.style.opacity = '0.5';
+    } else {
+      searchInput.disabled = false;
+      searchInput.placeholder = 'Type guest name to search...';
+      searchInput.style.opacity = '1';
+    }
   }
 }
 
@@ -243,7 +344,15 @@ function getNextTableNumber() {
 // Save table (add or edit)
 function saveTable() {
   const tableNumber = parseInt(document.getElementById("tableNumber").value);
+  const maxGuestsInput = document.getElementById("tableMaxGuests");
+  const maxGuests = maxGuestsInput ? parseInt(maxGuestsInput.value) : DEFAULT_MAX_GUESTS;
   const tagsContainer = document.getElementById("selectedGuestsTags");
+  
+  // Validate max guests
+  if (!maxGuests || maxGuests < 1) {
+    alert('Max guests must be at least 1');
+    return;
+  }
   
   // Get selected guests from tags
   const selectedGuests = Array.from(tagsContainer.querySelectorAll(".guest-tag"))
@@ -251,6 +360,11 @@ function saveTable() {
 
   if (selectedGuests.length === 0) {
     alert("Please select at least one guest.");
+    return;
+  }
+  
+  if (selectedGuests.length > maxGuests) {
+    alert(`Cannot exceed ${maxGuests} guests per table. Please remove ${selectedGuests.length - maxGuests} guest(s).`);
     return;
   }
 
@@ -293,9 +407,10 @@ function saveTable() {
   if (existingTableIndex >= 0) {
     // Edit existing table
     seatingData.tables[existingTableIndex].guests = selectedGuests;
+    seatingData.tables[existingTableIndex].maxGuests = maxGuests;
     updateGuestLookup();
     refreshTable(tableNumber);
-    console.log(`Table ${tableNumber} updated`);
+    console.log(`Table ${tableNumber} updated with max ${maxGuests} guests`);
   } else {
     // Add new table
     const newTable = {
@@ -303,11 +418,12 @@ function saveTable() {
       x: 50, // Center of venue
       y: 50,
       guests: selectedGuests,
+      maxGuests: maxGuests,
     };
     seatingData.tables.push(newTable);
     updateGuestLookup();
     addTableToVenue(newTable);
-    console.log(`Table ${tableNumber} added`);
+    console.log(`Table ${tableNumber} added with max ${maxGuests} guests`);
   }
 
   closeModal();
