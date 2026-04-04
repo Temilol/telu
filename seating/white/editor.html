@@ -42,6 +42,16 @@
       <button id="addTableBtn" class="control-btn primary-btn">
         ➕ Add New Table
       </button>
+      <div class="export-menu-container">
+        <button id="exportMenuBtn" class="control-btn primary-btn">
+          📥 Export Map
+        </button>
+        <div id="exportMenu" class="export-dropdown">
+          <button class="export-option" data-format="png">📊 PNG</button>
+          <button class="export-option" data-format="svg">🎨 SVG</button>
+          <button class="export-option" data-format="pdf">📄 PDF</button>
+        </div>
+      </div>
       <button id="clearBtn" class="control-btn danger-btn">
         🗑️ Clear All Tables
       </button>
@@ -133,12 +143,16 @@
   window.currentEventId = "wedding-seating-chart-white";
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script src="../../js/rsvp.js"></script>
 <script src="../../js/seating-chart.js"></script>
 <script src="../../js/firebase-guests.js"></script>
 <script src="../../js/seating-admin.js"></script>
 <script src="../../js/zoom-controls.js"></script>
 <script src="../../js/firebase-seating.js"></script>
+<script src="../../js/seating-export.js"></script>
 
 </body>
 </html>

@@ -13,6 +13,8 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/seating-shared.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -27,16 +29,24 @@
       <a href="editor.html" class="btn btn-secondary">✏️ Edit Seating</a>
     </div>
     <div>
-      <button class="btn btn-primary" onclick="exportSeatingChartAsSVG()">📥 Export as SVG</button>
-      <button class="btn btn-primary" onclick="window.print()" style="margin-left: 10px;">📄 Export as PDF</button>
+      <div class="export-menu-container">
+        <button id="exportMenuBtn" class="btn btn-primary">
+          📥 Export
+        </button>
+        <div id="exportMenu" class="export-dropdown">
+          <button class="export-option" data-format="png">📊 PNG</button>
+          <button class="export-option" data-format="svg">🎨 SVG</button>
+          <button class="export-option" data-format="pdf">📄 PDF</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <div id="content" class="loading">Loading seating chart...</div>
 </div>
 
-<!-- Seating Chart Export -->
-<script src="../../js/seating-chart-export.js"></script>
+<!-- Export functionality -->
+<script src="../../js/seating-view-export.js"></script>
 
 <!-- Firebase SDK -->
 <script type="module" src="../../js/firebase-init.js"></script>
