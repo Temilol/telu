@@ -1,6 +1,7 @@
 # Firebase Configuration
 # Keep sensitive credentials out of git
 js/firebase-config.js
+serviceAccountKey.json
 
 # Authentication - Generated files with secrets
 js/seating-auth.js
