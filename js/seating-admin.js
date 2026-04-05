@@ -371,6 +371,29 @@ function getNextTableNumber() {
   return maxNumber + 1;
 }
 
+// Calculate starting position for new table to avoid stacking
+function calculateNewTablePosition(tableIndex) {
+  // Spread tables in a grid pattern across the venue
+  // Start at center, then offset in a spiral/grid pattern
+  const baseX = 50;
+  const baseY = 50;
+  const offsetAmount = 15; // Percentage offset for each table
+  
+  // Create a grid position based on table index
+  const column = tableIndex % 3; // 3 columns
+  const row = Math.floor(tableIndex / 3); // Multiple rows
+  
+  // Calculate x and y with constraints to keep in venue bounds (10-90%)
+  let x = baseX + (column - 1) * offsetAmount;
+  let y = baseY + row * offsetAmount;
+  
+  // Keep positions within bounds
+  x = Math.max(15, Math.min(85, x));
+  y = Math.max(15, Math.min(85, y));
+  
+  return { x, y };
+}
+
 // Save table (add or edit)
 function saveTable() {
   const tableNumber = parseInt(document.getElementById("tableNumber").value);
@@ -443,18 +466,19 @@ function saveTable() {
     refreshTable(tableNumber);
     console.log(`Table ${tableNumber} updated with max ${maxGuests} guests`);
   } else {
-    // Add new table
+    // Add new table with offset position to avoid stacking
+    const { x, y } = calculateNewTablePosition(seatingData.tables.length);
     const newTable = {
       number: tableNumber,
-      x: 50, // Center of venue
-      y: 50,
+      x: x,
+      y: y,
       guests: selectedGuests,
       maxGuests: maxGuests,
     };
     seatingData.tables.push(newTable);
     updateGuestLookup();
     addTableToVenue(newTable);
-    console.log(`Table ${tableNumber} added with max ${maxGuests} guests`);
+    console.log(`Table ${tableNumber} added at (${x}%, ${y}%) with max ${maxGuests} guests`);
   }
 
   closeModal();
