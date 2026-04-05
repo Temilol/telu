@@ -17,7 +17,7 @@ class HouseholdManager {
 
     guests.forEach((guest) => {
       const householdId = guest.householdId;
-      
+
       // Skip guests without household ID
       if (!householdId || householdId === -1) {
         return;
@@ -34,7 +34,7 @@ class HouseholdManager {
       this.householdMap.get(householdId).push(guest);
     });
 
-    console.log(`🏠 Built household map: ${this.householdMap.size} households`);
+    console.log(`👥 Built household map: ${this.householdMap.size} households`);
   }
 
   /**
@@ -70,7 +70,7 @@ class HouseholdManager {
   getOtherHouseholdMembers(guestName) {
     const allMembers = this.getHouseholdMembers(guestName);
     return allMembers.filter(
-      (member) => member.name.toLowerCase() !== guestName.toLowerCase()
+      (member) => member.name.toLowerCase() !== guestName.toLowerCase(),
     );
   }
 
@@ -116,17 +116,17 @@ const householdManager = new HouseholdManager();
  */
 function getHouseholdBadgeHTML(guestName) {
   const otherMembers = householdManager.getOtherHouseholdMembers(guestName);
-  
+
   if (otherMembers.length === 0) {
     return null; // No other household members
   }
 
   const otherNames = otherMembers.map((m) => m.name).join(", ");
   const totalCount = otherMembers.length + 1;
-  
+
   return `
     <div class="household-info-badge" style="display: inline-flex; align-items: center; gap: 8px; background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; margin-top: -5px;">
-      <span style="font-size: 14px;">🏠</span>
+      <span style="font-size: 14px;"><i class="fa-solid fa-people-group"></i></span>
       <span><strong>Household:</strong> ${otherNames} (${totalCount} total)</span>
     </div>
   `;
@@ -140,9 +140,12 @@ function getHouseholdBadgeHTML(guestName) {
  */
 function findGuestTableForHousehold(guestName, tables) {
   if (!tables) return null;
-  
+
   for (const table of tables) {
-    if (table.guests && table.guests.some((g) => g.toLowerCase() === guestName.toLowerCase())) {
+    if (
+      table.guests &&
+      table.guests.some((g) => g.toLowerCase() === guestName.toLowerCase())
+    ) {
       return table.number;
     }
   }
@@ -180,7 +183,7 @@ function removeGuestFromAllTables(guestName, tables) {
   tables.forEach((table) => {
     if (table.guests) {
       table.guests = table.guests.filter(
-        (g) => g.toLowerCase() !== guestName.toLowerCase()
+        (g) => g.toLowerCase() !== guestName.toLowerCase(),
       );
     }
   });
