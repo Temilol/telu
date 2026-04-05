@@ -171,8 +171,8 @@ python3 upload_guests_to_firebase.py
 
 For detailed information, see:
 - [GUEST_DATABASE_SETUP.md](GUEST_DATABASE_SETUP.md) - Complete setup guide
-- [js/firebase-guests.js](js/firebase-guests.js) - Implementation details
-- [python/upload_guests_to_firebase.py](python/upload_guests_to_firebase.py) - Upload logic
+- [js/firebase-guests.js](../js/firebase-guests.js) - Implementation details
+- [python/upload_guests_to_firebase.py](../python/upload_guests_to_firebase.py) - Upload logic
 
 ---
 
