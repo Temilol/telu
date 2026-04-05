@@ -2,6 +2,9 @@
 # Keep sensitive credentials out of git
 js/firebase-config.js
 
+# Authentication - Generated files with secrets
+js/seating-auth.js
+
 # Environment variables
 .env
 .env.local

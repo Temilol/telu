@@ -44,6 +44,36 @@ jobs:
           };
           EOF
 
+      # Setup Node.js for build-auth.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Create .env file from GitHub Secrets
+      - name: Create Authentication Config
+        run: |
+          echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" > .env
+
+      # Build seating-auth.js with password from .env
+      - name: Build Authentication Script
+        run: node build-auth.js
+
+      # Verify seating-auth.js was generated
+      - name: Verify Auth Script
+        run: |
+          if [ -f js/seating-auth.js ]; then
+            echo "✓ seating-auth.js generated successfully"
+          else
+            echo "✗ Failed to generate seating-auth.js"
+            exit 1
+          fi
+
+      # Cleanup - Remove .env file before deployment
+      - name: Cleanup
+        if: always()
+        run: rm -f .env
+
       # Upload artifacts to GitHub Pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

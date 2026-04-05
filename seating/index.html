@@ -285,9 +285,14 @@
 </head>
 <body>
 
+<!-- Authentication -->
+<script src="../js/seating-auth.js"></script>
+<script>requireAuth();</script>
+
 <header>
   <h1>Seating Manager</h1>
   <p>Admin Dashboard — Manage & Edit Seating Arrangements</p>
+  <button id="logoutBtn" class="logout-btn" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;" onclick="logout()">🚪 Logout</button>
 </header>
 
 <main>
