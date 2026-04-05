@@ -18,8 +18,13 @@ if (!fs.existsSync(envPath)) {
 const envContent = fs.readFileSync(envPath, 'utf-8');
 const adminPasswordMatch = envContent.match(/ADMIN_PASSWORD=(.+)/);
 
-if (!adminPasswordMatch || !adminPasswordMatch[1]) {
-  console.error('❌ Error: ADMIN_PASSWORD not found in .env file');
+if (!adminPasswordMatch || !adminPasswordMatch[1] || adminPasswordMatch[1].trim() === '') {
+  console.error('❌ Error: ADMIN_PASSWORD not found or empty in .env file');
+  console.error('');
+  console.error('Make sure your .env file contains:');
+  console.error('  ADMIN_PASSWORD=your_password_here');
+  console.error('');
+  console.error('(no quotes needed)');
   process.exit(1);
 }
 

@@ -1,4 +1,4 @@
-name: Build and Deploy Page with Firebase Config
+name: Build and Deploy Page
 
 on:
   workflow_dispatch:
@@ -48,12 +48,29 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
+
+      # Verify ADMIN_PASSWORD secret is set
+      - name: Verify GitHub Secret
+        run: |
+          if [ -z "${{ secrets.ADMIN_PASSWORD }}" ]; then
+            echo "❌ ERROR: ADMIN_PASSWORD secret not set!"
+            echo ""
+            echo "To fix this:"
+            echo "1. Go to your repository Settings"
+            echo "2. Click 'Secrets and variables' → 'Actions'"
+            echo "3. Click 'New repository secret'"
+            echo "4. Name: ADMIN_PASSWORD"
+            echo "5. Value: your actual admin password"
+            echo "6. Click 'Add secret'"
+            exit 1
+          fi
 
       # Create .env file from GitHub Secrets
       - name: Create Authentication Config
         run: |
           echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" > .env
+          echo "✓ .env file created"
 
       # Build seating-auth.js with password from .env
       - name: Build Authentication Script
