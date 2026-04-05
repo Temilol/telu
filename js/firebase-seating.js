@@ -98,6 +98,12 @@ async function loadFromFirebase() {
       seatingData.headTable = data.headTable || { x: 50, y: 8 };
       seatingData.danceFloor = data.danceFloor || { x: 50, y: 92 };
       console.log(`✓ Loaded seating data from Firebase (${collectionName})`);
+      
+      // Update guest statistics if function exists
+      if (typeof updateGuestStats === 'function') {
+        updateGuestStats();
+      }
+      
       return true;
     } else {
       console.log("No Firebase data found, using default");

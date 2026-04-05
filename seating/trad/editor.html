@@ -56,6 +56,28 @@
         🗑️ Clear All Tables
       </button>
     </div>
+    
+    <!-- Guest Statistics -->
+    <div id="guestStats" style="background: #f5f5f5; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+        <div>
+          <div style="font-size: 24px; font-weight: bold; color: #4CAF50;">
+            <span id="totalGuestsCount">0</span>
+          </div>
+          <div style="font-size: 12px; color: #666; margin-top: 4px;">Total Guests</div>
+        </div>
+        <div>
+          <div style="font-size: 24px; font-weight: bold; color: #ff9800;">
+            <span id="unseatedGuestsCount">0</span>
+          </div>
+          <div style="font-size: 12px; color: #666; margin-top: 4px;">Unseated Guests</div>
+        </div>
+      </div>
+      <div style="font-size: 11px; color: #999; padding-top: 10px; border-top: 1px solid #ddd;">
+        <span id="seatedPercentage">0%</span> seated
+      </div>
+    </div>
+    
     <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666; border-top: 1px solid var(--color-secondary); padding-top: 15px;">☁️ All changes are automatically saved and synced across devices!</p>
     <p style="text-align: center; margin-top: 10px; font-size: 0.85rem; color: #666;">💡 <strong>Tip:</strong> Drag tables to move • Hover for edit/delete buttons</p>
   </div>
@@ -130,6 +152,30 @@
           </form>
         </div>
       </div>
+
+      <!-- Household Seating Modal -->
+      <div id="householdModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <h2 class="modal-header" id="householdModalTitle">👨‍👩‍👧‍👦 Seat Household Together?</h2>
+          
+          <div id="householdModalBody" style="padding: 20px 0;">
+            <p id="householdModalDescription" style="font-size: 13px; color: #666; margin-bottom: 15px;"></p>
+            
+            <div id="householdMembersList" style="background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; margin-bottom: 20px;">
+              <!-- Household members will be inserted here -->
+            </div>
+          </div>
+
+          <div class="form-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="button" id="householdYesBtn" class="btn-save" style="flex: 1; background: #4CAF50;">
+              👥 Seat Together
+            </button>
+            <button type="button" id="householdNoBtn" class="btn-cancel" style="flex: 1;">
+              Just This Guest
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -150,6 +196,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script src="../../js/rsvp.js"></script>
+<script src="../../js/household-manager.js"></script>
 <script src="../../js/seating-chart.js"></script>
 <script src="../../js/firebase-guests.js"></script>
 <script src="../../js/seating-admin.js"></script>

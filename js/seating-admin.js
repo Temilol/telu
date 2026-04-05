@@ -5,6 +5,10 @@ const DEFAULT_MAX_GUESTS = 10; // Default max guests per table
 let allGuests = []; // Cache for guest list
 let currentTableMaxGuests = DEFAULT_MAX_GUESTS; // Track current table's max
 
+// Household selection state
+let pendingHouseholdSelection = null; // { guestName, selectedGuestsMap, tagsContainer, tableNumber, tableMaxGuests }
+let householdPromptShown = false;
+
 // Initialize admin controls
 document.addEventListener("DOMContentLoaded", function () {
   setupAdminControls();
@@ -106,7 +110,8 @@ async function openModal(tableNumber = null) {
       // Pre-populate selected guests
       table.guests.forEach((guestName) => {
         selectedGuestsMap.set(guestName.toLowerCase(), guestName);
-        addGuestTag(guestName, selectedGuestsMap, tagsContainer);
+        const isHousehold = householdManager.getOtherHouseholdMembers(guestName).length > 0;
+        addGuestTag(guestName, selectedGuestsMap, tagsContainer, isHousehold);
       });
       updateGuestCountDisplay(selectedGuestsMap);
 
@@ -223,13 +228,32 @@ async function openModal(tableNumber = null) {
             alert(`Maximum ${currentTableMaxGuests} guests per table reached!`);
             return;
           }
+          
           const guestName = this.dataset.guestName;
-          selectedGuestsMap.set(guestName.toLowerCase(), guestName);
-          addGuestTag(guestName, selectedGuestsMap, tagsContainer);
-          updateGuestCountDisplay(selectedGuestsMap);
-          updatedSearchInput.value = "";
-          updatedSuggestionsDiv.innerHTML = "";
-          updatedSuggestionsDiv.classList.remove("show");
+          
+          // Check if guest is in a household and show prompt
+          const householdMembers = householdManager.getOtherHouseholdMembers(guestName);
+          
+          if (householdMembers.length > 0) {
+            // Show household prompt
+            pendingHouseholdSelection = {
+              guestName,
+              selectedGuestsMap,
+              tagsContainer,
+              tableNumber: currentModalMode === 'edit' ? document.getElementById('tableNumber').value : null,
+              tableMaxGuests: currentTableMaxGuests
+            };
+            
+            showHouseholdPrompt(guestName, householdMembers);
+          } else {
+            // No household, just add the guest directly
+            selectedGuestsMap.set(guestName.toLowerCase(), guestName);
+            addGuestTag(guestName, selectedGuestsMap, tagsContainer);
+            updateGuestCountDisplay(selectedGuestsMap);
+            updatedSearchInput.value = "";
+            updatedSuggestionsDiv.innerHTML = "";
+            updatedSuggestionsDiv.classList.remove("show");
+          }
         });
       });
     } else {
@@ -248,7 +272,7 @@ async function openModal(tableNumber = null) {
 }
 
 // Add a guest tag to the container
-function addGuestTag(guestName, selectedGuestsMap, tagsContainer) {
+function addGuestTag(guestName, selectedGuestsMap, tagsContainer, isPartOfHousehold = false) {
   if (tagsContainer.classList.contains("empty")) {
     tagsContainer.innerHTML = "";
     tagsContainer.classList.remove("empty");
@@ -256,10 +280,16 @@ function addGuestTag(guestName, selectedGuestsMap, tagsContainer) {
 
   const tag = document.createElement("div");
   tag.className = "guest-tag";
+  
+  // Add household indicator if part of household
+  const householdIndicator = isPartOfHousehold ? "🏠 " : "";
+  
   tag.innerHTML = `
-    ${guestName}
+    ${householdIndicator}${guestName}
     <span class="guest-tag-remove">✕</span>
   `;
+  tag.setAttribute('data-guest-name', guestName);
+  if (isPartOfHousehold) tag.setAttribute('data-household', 'true');
 
   tag.querySelector(".guest-tag-remove").addEventListener("click", () => {
     selectedGuestsMap.delete(guestName.toLowerCase());
@@ -354,9 +384,10 @@ function saveTable() {
     return;
   }
   
-  // Get selected guests from tags
+  // Get selected guests from tags using data attribute (not textContent which includes emoji)
   const selectedGuests = Array.from(tagsContainer.querySelectorAll(".guest-tag"))
-    .map((tag) => tag.textContent.replace("✕", "").trim());
+    .map((tag) => tag.getAttribute('data-guest-name'))
+    .filter(name => name); // Filter out any null values
 
   if (selectedGuests.length === 0) {
     alert("Please select at least one guest.");
@@ -427,6 +458,9 @@ function saveTable() {
   }
 
   closeModal();
+  
+  // Update guest statistics
+  updateGuestStats();
   
   // Auto-save to Firebase
   if (typeof window.autoSaveToFirebase === 'function') {
@@ -521,6 +555,9 @@ window.deleteTable = function (tableNumber) {
 
       console.log(`Table ${tableNumber} deleted`);
       
+      // Update guest statistics
+      updateGuestStats();
+      
       // Auto-save to Firebase
       if (typeof window.autoSaveToFirebase === 'function') {
         window.autoSaveToFirebase();
@@ -547,6 +584,9 @@ function clearAllTables() {
 
   console.log("All tables cleared");
   
+  // Update guest statistics
+  updateGuestStats();
+  
   // Auto-save to Firebase
   if (typeof window.autoSaveToFirebase === 'function') {
     window.autoSaveToFirebase();
@@ -557,6 +597,12 @@ async function loadAllGuests() {
   try {
     if (typeof loadGuestsFromFirebase === 'function') {
       allGuests = await loadGuestsFromFirebase();
+      
+      // Initialize household manager with loaded guests
+      if (typeof householdManager !== 'undefined') {
+        householdManager.buildHouseholdMap(allGuests);
+        console.log("✓ Household manager initialized");
+      }
     } else {
       console.log("firebase-guests.js not loaded, using empty guest list");
       allGuests = [];
@@ -565,4 +611,174 @@ async function loadAllGuests() {
     console.error("Error loading guests:", error);
     allGuests = [];
   }
+  
+  // Update guest statistics
+  updateGuestStats();
 }
+
+// ========== GUEST STATISTICS ==========
+
+/**
+ * Update guest statistics display
+ */
+function updateGuestStats() {
+  const totalGuestsEl = document.getElementById('totalGuestsCount');
+  const unseatedGuestsEl = document.getElementById('unseatedGuestsCount');
+  const seatedPercentageEl = document.getElementById('seatedPercentage');
+  
+  if (!totalGuestsEl || !unseatedGuestsEl || !seatedPercentageEl) {
+    return; // Not on admin page
+  }
+  
+  // Total guests (from all guests list)
+  const totalGuests = allGuests.length;
+  
+  // Seated guests (from seatingData)
+  const seatedGuests = seatingData.tables.reduce((sum, table) => {
+    return sum + (table.guests ? table.guests.length : 0);
+  }, 0);
+  
+  // Unseated guests
+  const unseatedGuests = totalGuests - seatedGuests;
+  
+  // Calculate percentage
+  const percentage = totalGuests > 0 ? Math.round((seatedGuests / totalGuests) * 100) : 0;
+  
+  // Update display
+  totalGuestsEl.textContent = totalGuests;
+  unseatedGuestsEl.textContent = unseatedGuests;
+  seatedPercentageEl.textContent = percentage + '%';
+  
+  console.log(`📊 Stats: ${seatedGuests}/${totalGuests} guests seated (${percentage}%)`);
+}
+// ========== HOUSEHOLD MANAGEMENT FUNCTIONS ==========
+
+/**
+ * Show household seating prompt modal
+ * @param {string} primaryGuestName - The guest that was selected
+ * @param {Array} otherMembers - Other household members
+ */
+function showHouseholdPrompt(primaryGuestName, otherMembers) {
+  const modal = document.getElementById("householdModal");
+  const title = document.getElementById("householdModalTitle");
+  const description = document.getElementById("householdModalDescription");
+  const membersList = document.getElementById("householdMembersList");
+  const yesBtn = document.getElementById("householdYesBtn");
+  const noBtn = document.getElementById("householdNoBtn");
+
+  if (!modal) return;
+
+  // Update title and description
+  title.textContent = "👨‍👩‍👧‍👦 Seat Household Together?";
+  const totalCount = otherMembers.length + 1;
+  description.innerHTML = `
+    <strong>${primaryGuestName}</strong> is part of a household with <strong>${otherMembers.length}</strong> other guest${otherMembers.length === 1 ? "" : "s"}.
+    <br><br>
+    Would you like to seat <strong>all ${totalCount} people together</strong> at this table?
+  `;
+
+  // Build members list
+  const allMembers = [{ name: primaryGuestName, isPrimary: true }, ...otherMembers];
+  membersList.innerHTML = allMembers
+    .map(
+      (member, idx) => `
+        <div style="padding: 12px 15px; border-bottom: ${idx < allMembers.length - 1 ? "1px solid #f0f0f0" : "none"}; display: flex; align-items: center; gap: 10px; font-size: 13px;">
+          <span style="font-size: 14px;">${member.isPrimary ? "✓" : "👥"}</span>
+          <span style="flex: 1; font-weight: ${member.isPrimary ? "600" : "400"}; color: #333;">${member.name}</span>
+          <span style="font-size: 11px; background: ${member.isPrimary ? "#d4edda" : "#fff3cd"}; color: ${member.isPrimary ? "#155724" : "#856404"}; padding: 3px 8px; border-radius: 3px;">
+            ${member.isPrimary ? "(Selected)" : "(Household)"}
+          </span>
+        </div>
+      `
+    )
+    .join("");
+
+  // Update button text
+  yesBtn.textContent = `👥 Seat Together (${totalCount} guests)`;
+  yesBtn.onclick = () => addHouseholdToTable(true);
+  noBtn.onclick = () => addHouseholdToTable(false);
+
+  // Show modal
+  modal.classList.add("show");
+}
+
+/**
+ * Handle household seating decision
+ * @param {boolean} seatTogether - Whether to seat household together
+ */
+function addHouseholdToTable(seatTogether) {
+  if (!pendingHouseholdSelection) return;
+
+  const { guestName, selectedGuestsMap, tagsContainer, tableNumber, tableMaxGuests } = pendingHouseholdSelection;
+  const modal = document.getElementById("householdModal");
+  const searchInput = document.getElementById("guestSearch");
+  const suggestionsDiv = document.getElementById("searchSuggestions");
+
+  if (seatTogether) {
+    // Seat entire household together
+    const householdMembers = householdManager.getHouseholdMembers(guestName);
+    let membersToAdd = [...householdMembers];
+    const tablesAffected = new Set(); // Track which tables had members removed
+
+    // Check if any household members are already seated elsewhere
+    membersToAdd.forEach((member) => {
+      const currentTable = findGuestTableForHousehold(member.name, seatingData.tables);
+      if (currentTable && currentTable !== tableNumber) {
+        console.log(`🔄 Removing ${member.name} from Table ${currentTable} to seat with household`);
+        tablesAffected.add(currentTable); // Track this table
+        removeGuestFromAllTables(member.name, seatingData.tables);
+      }
+    });
+
+    // Check space for all household members
+    const spaceNeeded = membersToAdd.filter((m) => !selectedGuestsMap.has(m.name.toLowerCase())).length;
+    const availableSpace = tableMaxGuests - selectedGuestsMap.size;
+
+    if (spaceNeeded > availableSpace) {
+      alert(`Not enough space! Need ${spaceNeeded} seats but only ${availableSpace} available.`);
+      modal.classList.remove("show");
+      pendingHouseholdSelection = null;
+      return;
+    }
+
+    // Refresh affected tables to show updated guest lists
+    tablesAffected.forEach((tableNum) => {
+      refreshTable(tableNum);
+    });
+
+    // Add all household members
+    membersToAdd.forEach((member) => {
+      if (!selectedGuestsMap.has(member.name.toLowerCase())) {
+        selectedGuestsMap.set(member.name.toLowerCase(), member.name);
+        addGuestTag(member.name, selectedGuestsMap, tagsContainer, true); // Mark as household
+      }
+    });
+  } else {
+    // Just seat the selected guest
+    selectedGuestsMap.set(guestName.toLowerCase(), guestName);
+    addGuestTag(guestName, selectedGuestsMap, tagsContainer, false);
+  }
+
+  updateGuestCountDisplay(selectedGuestsMap);
+  modal.classList.remove("show");
+  searchInput.value = "";
+  suggestionsDiv.innerHTML = "";
+  suggestionsDiv.classList.remove("show");
+  pendingHouseholdSelection = null;
+  
+  // Update guest statistics
+  updateGuestStats();
+}
+
+// Close household modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+  const householdModal = document.getElementById('householdModal');
+  if (householdModal) {
+    householdModal.addEventListener('click', function(e) {
+      if (e.target === householdModal) {
+        householdModal.classList.remove('show');
+        pendingHouseholdSelection = null;
+      }
+    });
+  }
+});
