@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — Find Your Seat</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../logo.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/seating-find-seat.css">
+</head>
+<body>
+
+<header>
+  <h1>Toluwani & Temilola</h1>
+  <p id="eventTitle">Loading...</p>
+</header>
+
+<nav class="breadcrumb">
+  <a href="../">Home</a>
+  <span>›</span>
+  <span>Find Your Seat</span>
+</nav>
+
+<section class="section-wrapper">
+  <!-- Search Section -->
+  <div class="search-section">
+    <h2>Find Your Table</h2>
+    <p>Enter your name to see your table assignment</p>
+    
+    <div class="search-box">
+      <input 
+        type="text" 
+        id="guestSearch" 
+        class="search-input" 
+        placeholder="Enter your name..."
+        autocomplete="off"
+      />
+      <span class="search-icon">🔎</span>
+    </div>
+
+    <div id="searchResult" class="search-result">
+      <div class="result-name" id="resultName"></div>
+      <div class="result-info" id="resultTable"></div>
+      <div class="result-tablemates" id="resultTablemates"></div>
+    </div>
+
+    <div id="noResult" class="no-result" style="text-align: center; padding: 20px; color: #999;">
+      <p>No guest found. Please check your name and try again.</p>
+    </div>
+
+    <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
+      <p>🔄 Loading seating data...</p>
+    </div>
+  </div>
+
+  <div id="errorMessage" style="display: none; background: #fff3f3; border: 1px solid #e8b4b4; color: #c62828; padding: 15px; border-radius: 8px; margin-top: 20px;">
+    <p>⚠️ Error loading seating data. Please refresh the page.</p>
+  </div>
+</section>
+
+<footer style="text-align: center; padding: 20px; font-size: 12px; margin-top: 40px;">
+  With love, Toluwani & Temilola 💕
+</footer>
+
+<!-- Firebase & Seating -->
+<script>
+  // Prevent seating-chart.js from auto-loading seating data
+  // We'll handle it manually after setting the active event
+  window.skipAutoLoadSeating = true;
+</script>
+<script type="module" src="../js/firebase-init.js"></script>
+<script src="../js/firebase-guests.js"></script>
+<script src="../js/firebase-seating.js"></script>
+<script src="../js/seating-chart.js"></script>
+<script src="../js/seating-event-config.js"></script>
+<script src="../js/seating-find-seat.js"></script>
+
+<script>
+  /**
+   * Unified Find Seat Page
+   * Loads the active event and displays seating based on that
+   */
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+    const eventTitle = document.getElementById('eventTitle');
+
+    try {
+      loadingSpinner.style.display = 'block';
+
+      // Wait for Firebase to initialize
+      let attempts = 0;
+      while (!window.firebaseInitialized && attempts < 20) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
+
+      if (!window.firebaseInitialized) {
+        throw new Error("Firebase initialization timeout");
+      }
+
+      // Get the active event
+      const activeEvent = await getActiveEvent();
+      window.currentEventId = activeEvent;
+
+      // Update page title based on active event
+      const eventName = activeEvent.includes('trad') ? 'Traditional Reception' : 'White Reception';
+      eventTitle.textContent = `${eventName} - Search for Your Table Assignment`;
+
+      // Load seating data for the active event
+      const seatingLoaded = await loadFromFirebase();
+
+      if (!seatingLoaded) {
+        throw new Error("Could not load seating data");
+      }
+
+      // Build guest lookup from loaded seating data
+      if (typeof updateGuestLookup === 'function') {
+        updateGuestLookup();
+      }
+
+      loadingSpinner.style.display = 'none';
+
+    } catch (error) {
+      console.error("Error initializing find-seat page:", error);
+      loadingSpinner.style.display = 'none';
+      errorMessage.style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>

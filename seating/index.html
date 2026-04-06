@@ -281,6 +281,16 @@
         grid-template-columns: 1fr;
       }
     }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    button:disabled:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
   </style>
 </head>
 <body>
@@ -352,12 +362,167 @@
     </div>
   </div>
 
+  <!-- Active Event Toggle -->
+  <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid var(--color-primary); box-shadow: 0 2px 8px var(--shadow);">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="margin: 0 0 5px 0; color: var(--color-primary); font-family: 'Playfair Display', serif;">Active Event for Guests</h3>
+        <p style="margin: 0; font-size: 0.9rem; color: #666;">Guests visiting the shared link will see this event's seating chart</p>
+        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #888;"><strong>Shared Link:</strong> <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">/find-seat</code></p>
+      </div>
+      <div style="text-align: right;">
+        <div style="margin-bottom: 10px; font-weight: 600; color: var(--color-primary);">
+          <span id="activeEventDisplay">Loading...</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="setTradEventBtn" onclick="setActiveEventAdmin('trad')" disabled style="padding: 10px 16px; background: var(--color-secondary); color: var(--color-primary); border: 2px solid var(--color-primary); border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.9rem; opacity: 0.5;">📅 Traditional</button>
+          <button id="setWhiteEventBtn" onclick="setActiveEventAdmin('white')" disabled style="padding: 10px 16px; background: var(--color-secondary); color: var(--color-primary); border: 2px solid var(--color-primary); border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.9rem; opacity: 0.5;">🤍 White</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </main>
 
 <footer>
   Temilola Seating Manager<br>
   © 2026 — All Rights Reserved
 </footer>
+
+<script type="module" src="../js/firebase-init.js"></script>
+<script src="../js/seating-event-config.js"></script>
+
+<script>
+  // Wait for Firebase to be ready
+  async function waitForFirebase(maxWait = 10000) {
+    const start = Date.now();
+    while (Date.now() - start < maxWait) {
+      if (window.firebaseInitialized && window.firebaseDB) {
+        console.log("✓ Firebase is ready");
+        return true;
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
+    console.error("❌ Firebase failed to initialize");
+    return false;
+  }
+
+  /**
+   * Initialize active event display on admin dashboard
+   */
+  document.addEventListener('DOMContentLoaded', async function() {
+    const tradBtn = document.getElementById('setTradEventBtn');
+    const whiteBtn = document.getElementById('setWhiteEventBtn');
+    const display = document.getElementById('activeEventDisplay');
+
+    try {
+      display.textContent = '⏳ Initializing...';
+      
+      console.log("Waiting for Firebase...");
+      const firebaseReady = await waitForFirebase(10000);
+
+      if (!firebaseReady) {
+        throw new Error("Firebase did not initialize within timeout");
+      }
+
+      console.log("Firebase ready, loading active event...");
+
+      // Load and display active event
+      if (typeof getActiveEvent !== 'function') {
+        throw new Error("getActiveEvent function not available");
+      }
+
+      const activeEvent = await getActiveEvent();
+      console.log("✓ Active event loaded:", activeEvent);
+      
+      updateActiveEventDisplay(activeEvent);
+      
+      // Enable buttons once Firebase is ready
+      tradBtn.disabled = false;
+      whiteBtn.disabled = false;
+      tradBtn.style.opacity = '1';
+      whiteBtn.style.opacity = '1';
+
+    } catch (error) {
+      console.error("❌ Error initializing dashboard:", error);
+      display.textContent = '⚠️ Firebase initialization failed';
+      display.style.color = '#d32f2f';
+    }
+  });
+
+  /**
+   * Update the active event display (which buttons are highlighted)
+   */
+  function updateActiveEventDisplay(activeEvent) {
+    const tradBtn = document.getElementById('setTradEventBtn');
+    const whiteBtn = document.getElementById('setWhiteEventBtn');
+    const display = document.getElementById('activeEventDisplay');
+
+    // Reset button styles
+    tradBtn.style.background = 'var(--color-secondary)';
+    tradBtn.style.color = 'var(--color-primary)';
+    whiteBtn.style.background = 'var(--color-secondary)';
+    whiteBtn.style.color = 'var(--color-primary)';
+
+    // Highlight active button
+    if (activeEvent.includes('trad')) {
+      tradBtn.style.background = 'var(--color-primary)';
+      tradBtn.style.color = 'white';
+      display.textContent = '📅 Traditional Reception is ACTIVE';
+    } else if (activeEvent.includes('white')) {
+      whiteBtn.style.background = 'var(--color-primary)';
+      whiteBtn.style.color = 'white';
+      display.textContent = '🤍 White Reception is ACTIVE';
+    }
+  }
+
+  /**
+   * Set active event (called by button clicks)
+   */
+  async function setActiveEventAdmin(eventId) {
+    const btn = eventId.includes('trad') 
+      ? document.getElementById('setTradEventBtn')
+      : document.getElementById('setWhiteEventBtn');
+    
+    // Check Firebase again before saving
+    if (!window.firebaseInitialized) {
+      alert("❌ Firebase is not ready. Please wait and try again.");
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Saving...';
+
+    try {
+      console.log(`Setting active event to: ${eventId}`);
+      const success = await setActiveEvent(eventId);
+      
+      if (success) {
+        console.log("✓ Event switched successfully");
+        updateActiveEventDisplay(eventId);
+        btn.textContent = '✅ Saved!';
+        
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      } else {
+        console.error("setActiveEvent returned false");
+        btn.textContent = '❌ Failed';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error setting active event:", error);
+      alert(`❌ Error: ${error.message}`);
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
+</script>
 
 </body>
 </html>

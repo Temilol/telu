@@ -34,6 +34,12 @@ window.updateGuestLookup = updateGuestLookup;
 
 // Initialize the page
 document.addEventListener("DOMContentLoaded", async function () {
+  // Skip auto-load if we're on a guest-facing page (find-seat)
+  if (window.skipAutoLoadSeating) {
+    console.log("⏭️  Skipping auto-load seating (guest page will handle it)");
+    return;
+  }
+
   // Load seating data from Firebase
   if (window.firebaseInitialized && typeof loadFromFirebase === "function") {
     await loadFromFirebase();
