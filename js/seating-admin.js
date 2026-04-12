@@ -10,9 +10,9 @@ let pendingHouseholdSelection = null; // { guestName, selectedGuestsMap, tagsCon
 let householdPromptShown = false;
 
 // Initialize admin controls
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   setupAdminControls();
-  loadAllGuests();
+  await loadAllGuests();
 });
 
 function setupAdminControls() {
@@ -54,13 +54,16 @@ function setupAdminControls() {
 
   // Form submission
   tableForm.addEventListener("submit", (e) => {
+    devLog("📝 Form clicked, calling saveTable()");
     e.preventDefault();
+    devLog("📝 Form submitted, calling saveTable()");
     saveTable();
   });
 }
 
 let currentModalMode = null; // Track if modal is in "add" or "edit" mode
 let originalGuests = []; // Track original guests for edit mode
+let originalMaxGuests = DEFAULT_MAX_GUESTS; // Track original maxGuests for edit mode
 
 // Open modal for adding/editing table
 async function openModal(tableNumber = null) {
@@ -74,7 +77,7 @@ async function openModal(tableNumber = null) {
   // Load guests if not already loaded
   if (allGuests.length === 0) {
     await loadAllGuests();
-    console.log(`Loaded ${allGuests.length} guests`);
+    devLog(`Loaded ${allGuests.length} guests`);
   }
 
   // Clear previous state
@@ -104,8 +107,9 @@ async function openModal(tableNumber = null) {
         currentTableMaxGuests = table.maxGuests || DEFAULT_MAX_GUESTS;
       }
 
-      // Store original guests for change detection
+      // Store original guests and maxGuests for change detection
       originalGuests = [...table.guests];
+      originalMaxGuests = table.maxGuests || DEFAULT_MAX_GUESTS;
 
       // Pre-populate selected guests
       table.guests.forEach((guestName) => {
@@ -137,7 +141,36 @@ async function openModal(tableNumber = null) {
     tableNumberInput.addEventListener("change", function () {
       validateTableNumber(this.value, currentModalMode);
     });
+
+    // Check if there are pending guests to prefill
+    if (
+      window.pendingGuestsForNewTable &&
+      window.pendingGuestsForNewTable.length > 0
+    ) {
+      window.pendingGuestsForNewTable.forEach((guestName) => {
+        const guest = allGuests.find(
+          (g) => g.name.toLowerCase() === guestName.toLowerCase(),
+        );
+        if (guest) {
+          selectedGuestsMap.set(guest.name.toLowerCase(), guest.name);
+          const isHousehold =
+            householdManager &&
+            householdManager.getOtherHouseholdMembers(guest.name).length > 0;
+          addGuestTag(
+            guest.name,
+            selectedGuestsMap,
+            tagsContainer,
+            isHousehold,
+          );
+        }
+      });
+      // Clear the pending guests after using them
+      window.pendingGuestsForNewTable = null;
+    }
   }
+
+  // Display guest count
+  updateGuestCountDisplay(selectedGuestsMap);
 
   // Add listener for max guests input to update limit in real-time
   const maxGuestsInput = document.getElementById("tableMaxGuests");
@@ -160,6 +193,10 @@ async function openModal(tableNumber = null) {
       currentTableMaxGuests = newMax;
       previousMax = newMax;
       updateGuestCountDisplay(selectedGuestsMap);
+      // Check if anything changed for edit mode (including maxGuests)
+      if (currentModalMode === "edit") {
+        checkForChanges(selectedGuestsMap);
+      }
     });
 
     maxGuestsInput.addEventListener("input", function () {
@@ -169,13 +206,14 @@ async function openModal(tableNumber = null) {
         if (newMax >= selectedGuestsMap.size) {
           currentTableMaxGuests = newMax;
           updateGuestCountDisplay(selectedGuestsMap);
+          // Check if anything changed for edit mode (including maxGuests)
+          if (currentModalMode === "edit") {
+            checkForChanges(selectedGuestsMap);
+          }
         }
       }
     });
   }
-
-  // Display guest count
-  updateGuestCountDisplay(selectedGuestsMap);
 
   // Remove old event listeners by cloning
   const newSearchInput = guestSearchInput.cloneNode(true);
@@ -187,7 +225,7 @@ async function openModal(tableNumber = null) {
   // Search functionality with fresh listener
   updatedSearchInput.addEventListener("input", function () {
     const query = this.value.trim().toLowerCase();
-    console.log(`Search query: "${query}"`);
+    devLog(`Search query: "${query}"`);
 
     if (query.length === 0) {
       updatedSuggestionsDiv.classList.remove("show");
@@ -202,7 +240,7 @@ async function openModal(tableNumber = null) {
         !selectedGuestsMap.has(guest.name.toLowerCase()),
     );
 
-    console.log(`Found ${filtered.length} matching guests`);
+    devLog(`Found ${filtered.length} matching guests`);
 
     // Show suggestions
     if (filtered.length > 0) {
@@ -279,6 +317,38 @@ async function openModal(tableNumber = null) {
   updatedSearchInput.addEventListener("change", () => {
     updateGuestCountDisplay(selectedGuestsMap);
   });
+
+  // Add direct button click logging
+  const saveBtn = document.querySelector(".btn-save");
+  if (saveBtn) {
+    devLog("🔵 Adding click listener to save button");
+    devLog("  Button element:", saveBtn);
+    devLog("  Button text:", saveBtn.textContent);
+    devLog("  Button classList:", saveBtn.className);
+    devLog("  Button disabled:", saveBtn.disabled);
+
+    // Remove old listeners by cloning
+    const newSaveBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+
+    const updatedSaveBtn = document.querySelector(".btn-save");
+    devLog("🔵 After cloning, new button:", updatedSaveBtn);
+
+    updatedSaveBtn.addEventListener("click", (e) => {
+      devLog("🔴 SAVE BUTTON CLICKED!");
+      devLog("  Event:", e);
+      e.preventDefault();
+      devLog("📝 Form about to submit via button click");
+      tableForm.dispatchEvent(new Event("submit", { bubbles: true }));
+    });
+
+    // Also test if button is clickable
+    updatedSaveBtn.style.cursor = "pointer";
+    updatedSaveBtn.style.pointerEvents = "auto";
+    devLog("🟢 Save button ready for clicks");
+  } else {
+    devLog("❌ Save button not found!");
+  }
 
   modal.classList.add("show");
   updatedSearchInput.focus();
@@ -415,16 +485,57 @@ function calculateNewTablePosition(tableIndex) {
 }
 
 // Save table (add or edit)
-function saveTable() {
-  const tableNumber = parseInt(document.getElementById("tableNumber").value);
+async function saveTable() {
+  devLog("🔵 saveTable() called");
+  devLog("═══ DIALOG STATE AT SAVE ═══");
+
+  // Log form element
+  const tableForm = document.getElementById("tableForm");
+  devLog("  Form element:", tableForm ? "FOUND" : "NOT FOUND");
+
+  // Log all input fields in the form
+  const tableNumberInput = document.getElementById("tableNumber");
   const maxGuestsInput = document.getElementById("tableMaxGuests");
+  const guestSearchInput = document.getElementById("guestSearch");
+  const tagsContainer = document.getElementById("selectedGuestsTags");
+
+  devLog("  INPUT FIELDS:");
+  devLog(`    tableNumber input value: "${tableNumberInput?.value}"`);
+  devLog(`    tableNumber disabled: ${tableNumberInput?.disabled}`);
+  devLog(`    maxGuests input value: "${maxGuestsInput?.value}"`);
+  devLog(`    guestSearch input value: "${guestSearchInput?.value}"`);
+
+  // Log selected guests tags
+  devLog("  SELECTED GUESTS TAGS:");
+  const guestTags = tagsContainer?.querySelectorAll(".guest-tag") || [];
+  devLog(`    Total tags found: ${guestTags.length}`);
+  guestTags.forEach((tag, idx) => {
+    const guestName = tag.getAttribute("data-guest-name");
+    const isHousehold = tag.getAttribute("data-household");
+    devLog(`      [${idx}] ${guestName} ${isHousehold ? "(household)" : ""}`);
+  });
+
+  // Log modal visibility
+  const modal = document.getElementById("tableModal");
+  devLog("  MODAL STATE:");
+  devLog(`    Modal exists: ${modal ? "YES" : "NO"}`);
+  devLog(
+    `    Modal visible (show class): ${modal?.classList.contains("show") ? "YES" : "NO"}`,
+  );
+  devLog(`    Modal display style: ${modal?.style.display}`);
+
+  const tableNumber = parseInt(document.getElementById("tableNumber").value);
   const maxGuests = maxGuestsInput
     ? parseInt(maxGuestsInput.value)
     : DEFAULT_MAX_GUESTS;
-  const tagsContainer = document.getElementById("selectedGuestsTags");
+
+  devLog(`  tableNumber: ${tableNumber}`);
+  devLog(`  maxGuests: ${maxGuests}`);
+  devLog(`  mode: ${currentModalMode}`);
 
   // Validate max guests
   if (!maxGuests || maxGuests < 1) {
+    devLog("❌ Max guests validation failed");
     alert("Max guests must be at least 1");
     return;
   }
@@ -436,12 +547,19 @@ function saveTable() {
     .map((tag) => tag.getAttribute("data-guest-name"))
     .filter((name) => name); // Filter out any null values
 
+  devLog(`  selectedGuests found: ${selectedGuests.length}`);
+  if (selectedGuests.length > 0) {
+    devLog(`    guests: ${selectedGuests.join(", ")}`);
+  }
+
   if (selectedGuests.length === 0) {
+    devLog("❌ No guests selected - returning early");
     alert("Please select at least one guest.");
     return;
   }
 
   if (selectedGuests.length > maxGuests) {
+    devLog(`❌ Too many guests (${selectedGuests.length} > ${maxGuests})`);
     alert(
       `Cannot exceed ${maxGuests} guests per table. Please remove ${selectedGuests.length - maxGuests} guest(s).`,
     );
@@ -454,6 +572,7 @@ function saveTable() {
       (t) => t.number === tableNumber,
     );
     if (tableExists) {
+      devLog("❌ Table already exists");
       return; // Validation already shown inline
     }
   }
@@ -475,6 +594,7 @@ function saveTable() {
         return `${guest} (Table ${table})`;
       })
       .join("\n");
+    devLog(`❌ Duplicate guests found: ${duplicates.join(", ")}`);
     alert(
       `The following guests are already assigned:\n\n${tableAssignments}\n\nPlease remove them before saving.`,
     );
@@ -488,11 +608,12 @@ function saveTable() {
 
   if (existingTableIndex >= 0) {
     // Edit existing table
+    devLog(`✏️ Editing existing table ${tableNumber}`);
     seatingData.tables[existingTableIndex].guests = selectedGuests;
     seatingData.tables[existingTableIndex].maxGuests = maxGuests;
     updateGuestLookup();
     refreshTable(tableNumber);
-    console.log(`Table ${tableNumber} updated with max ${maxGuests} guests`);
+    devLog(`✅ Table ${tableNumber} updated with max ${maxGuests} guests`);
   } else {
     // Add new table with offset position to avoid stacking
     const { x, y } = calculateNewTablePosition(seatingData.tables.length);
@@ -506,19 +627,29 @@ function saveTable() {
     seatingData.tables.push(newTable);
     updateGuestLookup();
     addTableToVenue(newTable);
-    console.log(
-      `Table ${tableNumber} added at (${x}%, ${y}%) with max ${maxGuests} guests`,
+    devLog(
+      `✅ Table ${tableNumber} added at (${x}%, ${y}%) with max ${maxGuests} guests`,
     );
   }
-
-  closeModal();
 
   // Update guest statistics
   updateGuestStats();
 
-  // Auto-save to Firebase
-  if (typeof window.autoSaveToFirebase === "function") {
-    window.autoSaveToFirebase();
+  // Save to Firebase before closing modal (so we can catch errors)
+  try {
+    devLog("🔵 Calling saveToFirebase()...");
+    const saveSuccess = await saveToFirebase();
+    if (!saveSuccess) {
+      devLog("❌ Firebase save failed - modal remains open for retry");
+      return; // Keep modal open if save fails
+    }
+    // Only close modal after successful Firebase save
+    devLog("🟢 Firebase save successful, closing modal");
+    closeModal();
+  } catch (error) {
+    devLog("❌ Error during Firebase save:", error);
+    // Modal remains open so user can retry
+    return;
   }
 }
 
@@ -552,7 +683,7 @@ function disableSaveButton() {
   if (saveBtn) saveBtn.disabled = true;
 }
 
-// Check if guests have changed in edit mode
+// Check if guests or maxGuests have changed in edit mode
 function checkForChanges(selectedGuestsMap) {
   const saveBtn = document.querySelector(".btn-save");
   if (!saveBtn || currentModalMode !== "edit") return;
@@ -560,14 +691,23 @@ function checkForChanges(selectedGuestsMap) {
   const currentGuests = Array.from(selectedGuestsMap.values()).sort();
   const originalSorted = [...originalGuests].sort();
 
-  // Compare sorted arrays
-  const hasChanged =
+  // Check if guests changed
+  const guestsChanged =
     currentGuests.length !== originalSorted.length ||
     !currentGuests.every(
       (guest, i) => guest.toLowerCase() === originalSorted[i].toLowerCase(),
     );
 
+  // Check if maxGuests changed
+  const maxGuestsChanged = currentTableMaxGuests !== originalMaxGuests;
+
+  // Enable save button if either guests or maxGuests changed
+  const hasChanged = guestsChanged || maxGuestsChanged;
   saveBtn.disabled = !hasChanged;
+
+  devLog(
+    `✏️ Edit mode change detection: guests=${guestsChanged}, maxGuests=${maxGuestsChanged} (${originalMaxGuests} → ${currentTableMaxGuests}), save button=${!saveBtn.disabled}`,
+  );
 }
 
 // Add table to venue map
@@ -611,7 +751,7 @@ window.deleteTable = function (tableNumber) {
         tableElement.remove();
       }
 
-      console.log(`Table ${tableNumber} deleted`);
+      devLog(`Table ${tableNumber} deleted`);
 
       // Update guest statistics
       updateGuestStats();
@@ -640,7 +780,7 @@ function clearAllTables() {
   const tables = venueMap.querySelectorAll(".venue-table");
   tables.forEach((table) => table.remove());
 
-  console.log("All tables cleared");
+  devLog("All tables cleared");
 
   // Update guest statistics
   updateGuestStats();
@@ -659,14 +799,14 @@ async function loadAllGuests() {
       // Initialize household manager with loaded guests
       if (typeof householdManager !== "undefined") {
         householdManager.buildHouseholdMap(allGuests);
-        console.log("✓ Household manager initialized");
+        devLog("✓ Household manager initialized");
       }
     } else {
-      console.log("firebase-guests.js not loaded, using empty guest list");
+      devLog("firebase-guests.js not loaded, using empty guest list");
       allGuests = [];
     }
   } catch (error) {
-    console.error("Error loading guests:", error);
+    devLog("Error loading guests:", error);
     allGuests = [];
   }
 
@@ -708,7 +848,7 @@ function updateGuestStats() {
   unseatedGuestsEl.textContent = unseatedGuests;
   seatedPercentageEl.textContent = percentage + "%";
 
-  console.log(
+  devLog(
     `📊 Stats: ${seatedGuests}/${totalGuests} guests seated (${percentage}%)`,
   );
 }
@@ -798,7 +938,7 @@ function addHouseholdToTable(seatTogether) {
         seatingData.tables,
       );
       if (currentTable && currentTable !== tableNumber) {
-        console.log(
+        devLog(
           `🔄 Removing ${member.name} from Table ${currentTable} to seat with household`,
         );
         tablesAffected.add(currentTable); // Track this table

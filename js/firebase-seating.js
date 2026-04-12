@@ -98,12 +98,12 @@ async function loadFromFirebase() {
       seatingData.headTable = data.headTable || { x: 50, y: 8 };
       seatingData.danceFloor = data.danceFloor || { x: 50, y: 92 };
       console.log(`✓ Loaded seating data from Firebase (${collectionName})`);
-      
+
       // Update guest statistics if function exists
-      if (typeof updateGuestStats === 'function') {
+      if (typeof updateGuestStats === "function") {
         updateGuestStats();
       }
-      
+
       return true;
     } else {
       console.log("No Firebase data found, using default");
@@ -130,15 +130,46 @@ async function saveToFirebase() {
     const exportData = {
       tables: seatingData.tables.map((table) => ({
         number: table.number,
-        x: table.x,
-        y: table.y,
-        guests: table.guests,
+        x: typeof table.x === "number" ? table.x : 50,
+        y: typeof table.y === "number" ? table.y : 50,
+        guests: Array.isArray(table.guests) ? table.guests : [],
+        maxGuests: Number(table.maxGuests) || 10,
       })),
       headTable: seatingData.headTable || { x: 50, y: 8 },
       danceFloor: seatingData.danceFloor || { x: 50, y: 92 },
       lastUpdated: new Date().toISOString(),
       updatedBy: "Admin",
     };
+
+    // Log the data being sent to Firebase for debugging
+    console.log("Sending to Firebase:", JSON.stringify(exportData, null, 2));
+
+    // Check for any undefined values before sending
+    const hasUndefined = (obj, path = "") => {
+      for (const key in obj) {
+        const currentPath = path ? `${path}.${key}` : key;
+        if (obj[key] === undefined) {
+          console.error(`Found undefined at: ${currentPath}`);
+          return true;
+        }
+        if (typeof obj[key] === "object" && obj[key] !== null) {
+          if (hasUndefined(obj[key], currentPath)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    if (hasUndefined(exportData)) {
+      console.error("Data contains undefined values! Fix before send.");
+      alert(
+        "❌ Data validation failed: undefined values detected. Check console.",
+      );
+      isSavingToFirebase = false;
+      updateSaveSpinner();
+      return false;
+    }
 
     const docRef = window.firebaseDoc(
       window.firebaseDB,

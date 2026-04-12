@@ -28,9 +28,7 @@
   <span>›</span>
   <span>White Reception</span>
   <span style="margin-left: 15px;">|</span>
-  <a href="./" style="margin-left: 15px;">🔍 Find Your Seat</a>
-  <span style="margin-left: 15px;">|</span>
-  <a href="view.html" style="margin-left: 15px;">👁️ View Seating Chart</a>
+  <a href="view.html" style="margin-left: 15px;"><i class="fa-solid fa-eye" style="color: black;"></i> View Seating Chart</a>
   <span style="margin-left: 15px;">|</span>
   <a href="../trad/editor.html" style="margin-left: 15px;">📅 Traditional Reception</a>
 </nav>
@@ -83,6 +81,77 @@
     <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666; border-top: 1px solid var(--color-secondary); padding-top: 15px;">☁️ All changes are automatically saved and synced across devices!</p>
     <p style="text-align: center; margin-top: 10px; font-size: 0.85rem; color: #666;">💡 <strong>Tip:</strong> Drag tables to move • Hover for edit/delete buttons</p>
   </div>
+
+  <!-- Right-side Unseated Guests Panel -->
+  <div id="unseatedPanelDrawer" style="position: fixed; right: -350px; top: 0; width: 350px; height: 100vh; background: white; border-left: 2px solid #ddd; box-shadow: -2px 0 8px rgba(0,0,0,0.15); z-index: 999; transition: right 0.3s ease; overflow-y: auto; display: flex; flex-direction: column;">
+    <!-- Panel Header -->
+    <div style="background: linear-gradient(135deg, #666 0%, #555 100%); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem;">👥 <span id="panelTitle">Unseated Guests</span></h3>
+        <div id="unseatedCountHeader" style="font-size: 0.85rem; opacity: 0.9; margin-top: 4px;">0 guests remaining</div>
+      </div>
+      <button id="closeUnseatedPanel" style="background: rgba(255,255,255,0.3); border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0 8px; border-radius: 4px; transition: background 0.2s;">✕</button>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div style="display: flex; background: #F8F4F1; border-bottom: 2px solid #E9D6CF; flex-shrink: 0;">
+      <button id="unseatedTab" style="flex: 1; padding: 12px; background: white; border: none; color: #333; cursor: pointer; font-weight: 600; border-bottom: 3px solid #C68A65; transition: all 0.2s;" data-tab="unseated">
+        Unseated
+      </button>
+      <button id="seatedTab" style="flex: 1; padding: 12px; background: #f5f5f5; border: none; color: #999; cursor: pointer; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s;" data-tab="seated">
+        Seated
+      </button>
+    </div>
+
+    <!-- Panel Controls (Unseated Tab) -->
+    <div id="unseatedControls" style="padding: 12px; border-bottom: 1px solid #E9D6CF; flex-shrink: 0;">
+      <input 
+        type="text" 
+        id="unseatedSearch" 
+        placeholder="Search guests..." 
+        style="width: 100%; padding: 8px 10px; border: 1px solid #E9D6CF; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"
+      >
+      <button id="bulkModeToggle" style="width: 100%; padding: 8px; font-size: 0.85rem; background: #C68A65; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.2s; margin-top: 8px;">
+        📋 Bulk
+      </button>
+    </div>
+
+    <!-- Panel Controls (Seated Tab) -->
+    <div id="seatedControls" style="padding: 12px; border-bottom: 1px solid #E9D6CF; flex-shrink: 0; display: none;">
+      <input 
+        type="text" 
+        id="seatedSearch" 
+        placeholder="Search guests..." 
+        style="width: 100%; padding: 8px 10px; border: 1px solid #E9D6CF; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"
+      >
+      <button id="seatedSortToggle" style="width: 100%; padding: 8px; font-size: 0.85rem; background: #C68A65; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.2s; margin-top: 8px;">
+        🔀 Sort by Table
+      </button>
+    </div>
+
+    <!-- Guests List -->
+    <div id="unseatedGuestsList" style="flex: 1; overflow-y: auto; padding: 8px 0;">
+      <div style="padding: 20px 15px; text-align: center; color: #999;">Loading guests...</div>
+    </div>
+
+    <!-- Seated Guests List (hidden by default) -->
+    <div id="seatedGuestsList" style="flex: 1; overflow-y: auto; padding: 8px 0; display: none;">
+      <div style="padding: 20px 15px; text-align: center; color: #999;">Loading guests...</div>
+    </div>
+
+    <!-- Bulk Mode Controls (hidden by default) -->
+    <div id="bulkControlsSection" style="display: none; padding: 12px; border-top: 2px solid #C68A65; background: #F8F4F1; flex-shrink: 0;">
+      <button id="selectAllBtn" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; margin-bottom: 6px;">✓ Select All</button>
+      <button id="deselectAllBtn" style="width: 100%; padding: 10px; background: #E9D6CF; color: #C68A65; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; margin-bottom: 6px;">✕ Clear All</button>
+      <div id="bulkCount" style="text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 8px; font-weight: 500;">0 selected</div>
+      <button id="bulkAssignBtn" style="width: 100%; padding: 10px; background: #C68A65; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.95rem;">🎯 Assign to Table</button>
+    </div>
+  </div>
+
+  <!-- Panel Toggle Button (floating) -->
+  <button id="openUnseatedPanel" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #C68A65 0%, #b57753 100%); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(198, 138, 101, 0.3); transition: all 0.3s; z-index: 998; display: none;">
+    👥
+  </button>
 
   <!-- Visual Seating Chart -->
   <div class="chart-section">
@@ -203,11 +272,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- Development Configuration (must load first) -->
+<script src="../../js/dev-config.js"></script>
+
 <script src="../../js/rsvp.js"></script>
 <script src="../../js/household-manager.js"></script>
 <script src="../../js/seating-chart.js"></script>
 <script src="../../js/firebase-guests.js"></script>
 <script src="../../js/seating-admin.js"></script>
+<script src="../../js/seating-unseated-panel.js"></script>
 <script src="../../js/zoom-controls.js"></script>
 <script src="../../js/firebase-seating.js"></script>
 <script src="../../js/seating-export.js"></script>
