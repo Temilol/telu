@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Toluwani & Temilola — Gifts</title>
+
+  <link rel="icon" type="image/png" href="../logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      overscroll-behavior-y: none;
+    }
+
+    :root {
+      --color-primary: #C68A65;
+      --color-secondary: #E9D6CF;
+      --color-text: #3B2F2F;
+      --color-bg: #F8F4F1;
+      --card-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Side Images */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-image: url('../image.jpg');
+      background-size: cover;
+      background-position: 38% center;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+    }
+
+    body::after {
+      right: 0;
+    }
+
+    @media (max-width: 1400px) {
+      body::before,
+      body::after {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      body::before,
+      body::after {
+        width: 80px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+    }
+
+    main {
+      flex: 1;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 25px;
+      background: var(--color-secondary);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      margin: 0;
+      font-size: 2.8rem;
+      color: var(--color-primary);
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      color: var(--color-text);
+      opacity: 0.85;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      flex: 1;
+    }
+
+    .intro-text {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--color-text);
+    }
+
+    .intro-text strong {
+      color: var(--color-primary);
+    }
+
+    .gifts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .gifts-grid > :last-child {
+      grid-column: 1 / -1;
+      max-width: 50%;
+      margin: 0 auto;
+    }
+
+    .gift-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-top: 4px solid var(--color-primary);
+    }
+
+    .gift-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .gift-card i {
+      font-size: 2.5rem;
+      color: var(--color-primary);
+      margin-bottom: 15px;
+    }
+
+    .gift-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+    }
+
+    .gift-card .details {
+      background: var(--color-bg);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gift-card .details code {
+      background: var(--color-secondary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      color: var(--color-primary);
+    }
+
+    .registry-section {
+      background: linear-gradient(135deg, var(--color-secondary) 0%, rgba(233, 214, 207, 0.6) 100%);
+      border-radius: 12px;
+      padding: 60px 40px;
+      text-align: center;
+      margin-top: 50px;
+      box-shadow: 0 8px 24px var(--shadow);
+      border: 2px solid var(--color-primary);
+    }
+
+    .registry-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--color-primary);
+      margin-bottom: 15px;
+    }
+
+    .registry-section p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+
+    .registry-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .registry-btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: var(--color-primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .registry-btn:hover {
+      background: #9B6D54;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .note-section {
+      background: white;
+      border-left: 4px solid var(--color-primary);
+      border-radius: 8px;
+      padding: 25px;
+      margin-top: 40px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .note-section h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--color-primary);
+      margin-bottom: 12px;
+    }
+
+    .note-section p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--color-secondary);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      color: var(--color-text);
+    }
+
+    footer a {
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1024px) {
+      .gifts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+
+      .container {
+        padding: 40px 20px;
+      }
+
+      .gifts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .registry-section {
+        padding: 30px 20px;
+      }
+
+      .registry-section h2 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>💝 Gifts & Registry</h1>
+    <p>Thank you for celebrating with us!</p>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="intro-text">
+        <p>Your love and support mean the world to us. If you'd like to give us a monetary gift, we've provided several convenient options below. <strong>No gift is ever expected, your presence is the greatest gift of all!</strong></p>
+      </div>
+
+      <div class="gifts-grid">
+        <!-- Zelle -->
+        <div class="gift-card">
+          <i class="fas fa-bank"></i>
+          <h3>Zelle</h3>
+          <div class="details">
+            <span><strong>Username:</strong> <code>taiwotolu@gmail.com</code><br><strong>Name:</strong> Toluwani Taiwo</span>
+          </div>
+          <p style="font-size: 0.9rem; opacity: 0.8;">Available through your bank's app or website</p>
+        </div>
+
+        <!-- Bank Transfer -->
+        <div class="gift-card">
+          <i class="fas fa-university"></i>
+          <h3>Bank Transfer</h3>
+          <div class="details">
+            <span><strong>Account Number:</strong> <code>731955800</code><br><strong>Routing Number:</strong> <code>111000614</code></span>
+          </div>
+          <p style="font-size: 0.9rem; opacity: 0.8;">Direct transfer</p>
+        </div>
+
+        <!-- Cash -->
+        <div class="gift-card">
+          <i class="fas fa-money-bill"></i>
+          <h3>Cash</h3>
+          <div class="details">
+            <span>Placed in envelopes</span>
+          </div>
+          <p style="font-size: 0.9rem; opacity: 0.8;">This can be presented at the ceremony</p>
+        </div>
+
+        <!-- Check -->
+        <div class="gift-card">
+          <i class="fas fa-envelope"></i>
+          <h3>Check</h3>
+          <div class="details">
+            <span>Made out to Toluwani & Temilola Wedding Funds</span>
+          </div>
+          <p style="font-size: 0.9rem; opacity: 0.8;">This can be presented at the ceremony</p>
+        </div>
+        
+        <!-- Venmo -->
+        <div class="gift-card">
+            <i class="fas fa-qrcode"></i>
+            <h3>Venmo</h3>
+            <div class="details">
+                <img src="venmo.jpg" alt="Venmo QR Code" style="width: 350px; height: 350px; border-radius: 8px;">
+            </div>
+            <p style="font-size: 0.9rem; opacity: 0.8;"><span>Username: <code>@Toluwani-Taiwo</code></span></p>
+        </div>
+
+        <!-- Cash App -->
+        <div class="gift-card">
+          <i class="fas fa-mobile-alt"></i>
+          <h3>Cash App</h3>
+          <div class="details">
+            <img src="cashapp.jpg" alt="Cash App QR Code" style="width: 350px; height: 350px; border-radius: 8px;">
+          </div>  
+          <p style="font-size: 0.9rem; opacity: 0.8;"><span>Username: <code>$ToluwaniTaiwo</code></span></p>
+        </div>
+        
+        <!-- PayPal -->
+        <div class="gift-card">
+          <i class="fab fa-paypal"></i>
+          <h3>PayPal</h3>
+          <div class="details">
+            <img src="paypal.jpg" alt="PayPal QR Code" style="width: 350px; height: 350px; border-radius: 8px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="registry-section">
+        <h2>Wedding Registry</h2>
+        <p>Browse our wishlist for curated experiences and items we love</p>
+        <div class="registry-links">
+          <a href="https://www.zola.com/registry/tolutemi" target="_blank" class="registry-btn">Visit Registry</a>
+        </div>
+      </div>
+
+      <div class="note-section">
+        <h3>💝 A Note of Gratitude</h3>
+        <p>Whether you choose to give a monetary gift, a registered item, or simply your presence and well-wishes, we're so grateful for your support as we celebrate our marriage. Thank you for being part of our special day!</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Toluwani & Temilola. All rights reserved. <a href="../index.html">← Back Home</a></p>
+  </footer>
+</body>
+</html>
