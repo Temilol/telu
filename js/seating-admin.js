@@ -164,6 +164,15 @@ async function openModal(tableNumber = null) {
           );
         }
       });
+      // Update max guests if pending guests exceed the default
+      const pendingCount = selectedGuestsMap.size;
+      if (pendingCount > currentTableMaxGuests) {
+        currentTableMaxGuests = pendingCount;
+        const maxGuestsInput = document.getElementById("tableMaxGuests");
+        if (maxGuestsInput) {
+          maxGuestsInput.value = pendingCount;
+        }
+      }
       // Clear the pending guests after using them
       window.pendingGuestsForNewTable = null;
     }

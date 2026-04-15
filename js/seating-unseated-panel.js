@@ -729,13 +729,12 @@ function handleBulkAssign() {
     return;
   }
 
-  createBulkTableMenu((selectedTable) => {
-    assignBulkGuestsToTable(selectedTable);
-  }, bulkSelectedGuests.size);
+  // Step 1: Show confirmation with household toggle first
+  showBulkAssignmentConfirmation();
 }
 
 // Create table menu for bulk assignment
-function createBulkTableMenu(callback, selectedCount = null) {
+function createBulkTableMenu(callback, selectedCount = null, finalGuestNames = null) {
   if (typeof seatingData === "undefined" || seatingData.tables.length === 0) {
     alert("No tables created yet.");
     return;
@@ -760,10 +759,7 @@ function createBulkTableMenu(callback, selectedCount = null) {
   `;
 
   const title = document.createElement("h3");
-  let titleText = `Assign guests to table`;
-  if (selectedCount) {
-    titleText = `Assign ${selectedCount} guests to table`;
-  }
+  const titleText = `Assign ${selectedCount} guest${selectedCount === 1 ? "" : "s"} to table`;
   title.textContent = titleText;
   title.style.cssText =
     "margin: 0 0 15px 0; color: #3B2F2F; text-align: center; font-family: 'Playfair Display', serif; flex-shrink: 0;";
@@ -877,11 +873,13 @@ function createBulkTableMenu(callback, selectedCount = null) {
     e.stopPropagation();
     document.body.removeChild(menu);
     // Store pending guests for the new table (bulk mode)
-    window.pendingGuestsForNewTable = Array.from(bulkSelectedGuests).map(
-      (guestName) =>
-        unseatedGuestsList.find((g) => g.name.toLowerCase() === guestName)
-          ?.name || guestName,
-    );
+    window.pendingGuestsForNewTable = finalGuestNames
+      ? [...finalGuestNames]
+      : Array.from(bulkSelectedGuests).map(
+          (guestName) =>
+            unseatedGuestsList.find((g) => g.name.toLowerCase() === guestName)
+              ?.name || guestName,
+        );
     if (typeof openModal === "function") {
       openModal(null);
     }
@@ -901,17 +899,428 @@ function createBulkTableMenu(callback, selectedCount = null) {
   }, 50);
 }
 
-// Assign multiple guests to table
+// Assign multiple guests to table (with confirmation)
 function assignBulkGuestsToTable(tableNumber) {
+  // This is no longer called directly - handled by the new flow
+}
+
+// Compute bulk guest lists with household grouping
+function computeBulkGuestData() {
   const selectedGuests = Array.from(bulkSelectedGuests);
+  const guestsToAdd = new Set();
+  const householdsProcessed = new Set();
+  const householdGroups = [];
 
   selectedGuests.forEach((guestName) => {
     const guest = unseatedGuestsList.find(
       (g) => g.name.toLowerCase() === guestName,
     );
-    if (guest) {
-      assignGuestToTable(guest.name, tableNumber);
+    if (!guest) return;
+
+    const householdMembers =
+      typeof householdManager !== "undefined"
+        ? householdManager.getHouseholdMembers(guest.name)
+        : [];
+
+    if (householdMembers.length > 1) {
+      const householdId = householdManager.getHouseholdId(guest.name);
+      if (!householdsProcessed.has(householdId)) {
+        householdsProcessed.add(householdId);
+        const groupMembers = [];
+        householdMembers.forEach((member) => {
+          guestsToAdd.add(member.name);
+          groupMembers.push(member.name);
+        });
+        const selectedInGroup = groupMembers.filter((n) =>
+          selectedGuests.includes(n.toLowerCase()),
+        );
+        householdGroups.push({
+          members: groupMembers,
+          selected: selectedInGroup,
+          householdId: householdId,
+          isHousehold: true,
+        });
+      }
+    } else {
+      guestsToAdd.add(guest.name);
+      householdGroups.push({
+        members: [guest.name],
+        selected: [guest.name],
+        isHousehold: false,
+      });
     }
+  });
+
+  return {
+    guestsToAdd: Array.from(guestsToAdd),
+    householdGroups,
+    selectedOnly: selectedGuests.map((gn) => {
+      const guest = unseatedGuestsList.find(
+        (g) => g.name.toLowerCase() === gn,
+      );
+      return guest ? guest.name : gn;
+    }),
+  };
+}
+
+// Step 1: Show confirmation dialog with household toggle
+function showBulkAssignmentConfirmation() {
+  const bulkData = computeBulkGuestData();
+
+  // Per-household inclusion tracking (groupIndex → boolean)
+  const householdInclusion = new Map();
+  bulkData.householdGroups.forEach((group, index) => {
+    if (group.isHousehold) {
+      householdInclusion.set(index, true);
+    }
+  });
+  const hasAnyHouseholds = householdInclusion.size > 0;
+
+  // Compute guest count based on current toggle states
+  const computeGuestCount = () => {
+    let count = 0;
+    bulkData.householdGroups.forEach((group, index) => {
+      if (group.isHousehold && householdInclusion.has(index)) {
+        count += householdInclusion.get(index)
+          ? group.members.length
+          : group.selected.length;
+      } else {
+        count += group.members.length;
+      }
+    });
+    return count;
+  };
+
+  // Build final guest list based on current toggle states
+  const buildFinalGuests = () => {
+    const guests = [];
+    const includedHouseholdIds = new Set();
+    bulkData.householdGroups.forEach((group, index) => {
+      if (group.isHousehold && householdInclusion.has(index)) {
+        if (householdInclusion.get(index)) {
+          guests.push(...group.members);
+          includedHouseholdIds.add(group.householdId);
+        } else {
+          guests.push(...group.selected);
+        }
+      } else {
+        guests.push(...group.members);
+      }
+    });
+    return { guests, includedHouseholdIds };
+  };
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+  `;
+
+  const content = document.createElement("div");
+  content.style.cssText = `
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+    max-width: 400px;
+    max-height: 70vh;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+  `;
+
+  // Title
+  const title = document.createElement("h2");
+  title.textContent = "Bulk Assignment";
+  title.style.cssText =
+    "margin: 0 0 10px 0; color: #3B2F2F; font-family: 'Playfair Display', serif; font-size: 1.4rem;";
+  content.appendChild(title);
+
+  // Summary
+  const summary = document.createElement("div");
+  summary.style.cssText =
+    "color: #666; margin-bottom: 15px; font-size: 0.95rem;";
+  const updateSummary = () => {
+    const count = computeGuestCount();
+    summary.textContent = `${count} guest${count === 1 ? "" : "s"} will be seated`;
+  };
+  updateSummary();
+  content.appendChild(summary);
+
+  // Master toggle for household inclusion
+  let masterCheckbox = null;
+  if (hasAnyHouseholds) {
+    const toggleContainer = document.createElement("div");
+    toggleContainer.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border: 1px solid #E9D6CF;
+    `;
+
+    masterCheckbox = document.createElement("input");
+    masterCheckbox.type = "checkbox";
+    masterCheckbox.checked = true;
+    masterCheckbox.style.cssText =
+      "width: 18px; height: 18px; cursor: pointer;";
+    masterCheckbox.onchange = () => {
+      householdInclusion.forEach((val, key) => {
+        householdInclusion.set(key, masterCheckbox.checked);
+      });
+      updateSummary();
+      listContainer.innerHTML = "";
+      renderGuestList();
+    };
+    toggleContainer.appendChild(masterCheckbox);
+
+    const toggleLabel = document.createElement("label");
+    toggleLabel.style.cssText = `
+      cursor: pointer;
+      flex: 1;
+      font-size: 0.9rem;
+      color: #333;
+    `;
+    toggleLabel.innerHTML = `<strong>Include all household members</strong>`;
+    toggleLabel.onclick = () => masterCheckbox.click();
+    toggleContainer.appendChild(toggleLabel);
+
+    content.appendChild(toggleContainer);
+  }
+
+  // Update master checkbox state based on individual toggles
+  const updateMasterCheckbox = () => {
+    if (!masterCheckbox) return;
+    const values = Array.from(householdInclusion.values());
+    const allChecked = values.every((v) => v);
+    const noneChecked = values.every((v) => !v);
+    masterCheckbox.checked = allChecked;
+    masterCheckbox.indeterminate = !allChecked && !noneChecked;
+  };
+
+  // Guest list
+  const listContainer = document.createElement("div");
+  listContainer.style.cssText = `
+    max-height: 35vh;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    border: 1px solid #E9D6CF;
+    border-radius: 4px;
+    padding: 12px;
+    background: #fafafa;
+  `;
+
+  const renderGuestList = () => {
+    bulkData.householdGroups.forEach((group, index) => {
+      if (group.isHousehold) {
+        const included = householdInclusion.get(index);
+
+        const householdDiv = document.createElement("div");
+        householdDiv.style.cssText = `
+          margin-bottom: 10px;
+          padding: 10px;
+          background: white;
+          border: 1px solid #E9D6CF;
+          border-radius: 4px;
+        `;
+
+        // Household header with per-household toggle
+        const householdHeader = document.createElement("div");
+        householdHeader.style.cssText =
+          "display: flex; align-items: center; gap: 8px; margin-bottom: 6px;";
+
+        const hCheckbox = document.createElement("input");
+        hCheckbox.type = "checkbox";
+        hCheckbox.checked = included;
+        hCheckbox.style.cssText =
+          "width: 16px; height: 16px; cursor: pointer; flex-shrink: 0;";
+        hCheckbox.onchange = () => {
+          householdInclusion.set(index, hCheckbox.checked);
+          updateMasterCheckbox();
+          updateSummary();
+          listContainer.innerHTML = "";
+          renderGuestList();
+        };
+        householdHeader.appendChild(hCheckbox);
+
+        const headerLabel = document.createElement("span");
+        headerLabel.style.cssText =
+          "font-weight: 600; color: #C68A65; font-size: 0.9rem; cursor: pointer;";
+        const displayCount = included
+          ? group.members.length
+          : group.selected.length;
+        headerLabel.innerHTML = `<i class="fa-solid fa-people-group"></i> Household (${displayCount} ${displayCount === 1 ? "person" : "people"})`;
+        headerLabel.onclick = () => hCheckbox.click();
+        householdHeader.appendChild(headerLabel);
+
+        householdDiv.appendChild(householdHeader);
+
+        // List members
+        group.members.forEach((memberName) => {
+          const isSelected = group.selected.includes(memberName);
+          const isExcluded = !included && !isSelected;
+
+          const guestDiv = document.createElement("div");
+          guestDiv.style.cssText = `
+            padding: 4px 8px; font-size: 0.9rem; margin-left: 24px;
+            color: ${isExcluded ? "#bbb" : "#333"};
+            ${isExcluded ? "text-decoration: line-through;" : ""}
+          `;
+
+          let label = `• ${memberName}`;
+          if (!isSelected) {
+            label += included
+              ? ' <span style="color: #C68A65; font-size: 0.8rem;">(household)</span>'
+              : ' <span style="color: #bbb; font-size: 0.8rem;">(excluded)</span>';
+          }
+          guestDiv.innerHTML = label;
+          householdDiv.appendChild(guestDiv);
+        });
+
+        listContainer.appendChild(householdDiv);
+      } else {
+        // Single guest (no household)
+        const guestDiv = document.createElement("div");
+        guestDiv.style.cssText =
+          "padding: 8px 10px; color: #333; font-size: 0.9rem; margin-bottom: 6px;";
+        guestDiv.textContent = group.members[0];
+        listContainer.appendChild(guestDiv);
+      }
+    });
+  };
+
+  renderGuestList();
+  content.appendChild(listContainer);
+
+  // Buttons
+  const buttonContainer = document.createElement("div");
+  buttonContainer.style.cssText = `
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  `;
+
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Choose Table \u2192";
+  nextBtn.style.cssText = `
+    flex: 1;
+    padding: 12px;
+    background: #C68A65;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  `;
+  nextBtn.onmouseover = () => (nextBtn.style.background = "#b57753");
+  nextBtn.onmouseout = () => (nextBtn.style.background = "#C68A65");
+  nextBtn.onclick = () => {
+    document.body.removeChild(modal);
+    // Step 2: Now show the table menu filtered by actual guest count
+    const { guests: finalGuests, includedHouseholdIds } = buildFinalGuests();
+    createBulkTableMenu(
+      (selectedTable) => {
+        executeBulkAssignment(selectedTable, finalGuests, includedHouseholdIds);
+      },
+      finalGuests.length,
+      finalGuests,
+    );
+  };
+  buttonContainer.appendChild(nextBtn);
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.style.cssText = `
+    flex: 1;
+    padding: 12px;
+    background: #E9D6CF;
+    color: #3B2F2F;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+  `;
+  cancelBtn.onmouseover = () => (cancelBtn.style.background = "#dfc4b8");
+  cancelBtn.onmouseout = () => (cancelBtn.style.background = "#E9D6CF");
+  cancelBtn.onclick = () => {
+    document.body.removeChild(modal);
+  };
+  buttonContainer.appendChild(cancelBtn);
+
+  content.appendChild(buttonContainer);
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+}
+
+// Execute the actual bulk assignment
+function executeBulkAssignment(tableNumber, guestsToAdd, householdsToInclude) {
+  const selectedGuests = Array.from(bulkSelectedGuests);
+  const table = seatingData.tables.find((t) => t.number === tableNumber);
+
+  if (!table) {
+    console.error("❌ Table not found");
+    return;
+  }
+
+  const householdsProcessed = new Set();
+
+  // Process selected guests and their households - removing from old tables
+  // Only for households that are being seated together
+  selectedGuests.forEach((guestName) => {
+    const guest = unseatedGuestsList.find(
+      (g) => g.name.toLowerCase() === guestName,
+    );
+
+    if (!guest) return;
+
+    const householdMembers =
+      typeof householdManager !== "undefined"
+        ? householdManager.getHouseholdMembers(guest.name)
+        : [];
+
+    if (householdMembers.length > 1) {
+      const householdId = householdManager.getHouseholdId(guest.name);
+
+      // Skip removal if this household is not included for seat-together
+      if (householdsToInclude && !householdsToInclude.has(householdId)) {
+        return;
+      }
+
+      if (!householdsProcessed.has(householdId)) {
+        householdsProcessed.add(householdId);
+
+        householdMembers.forEach((member) => {
+          const currentTable = findGuestTable(member.name, seatingData.tables);
+          if (currentTable && currentTable !== tableNumber) {
+            removeGuestFromAllTables(member.name, seatingData.tables);
+            refreshTable(currentTable);
+            console.log(
+              `🔄 Removed ${member.name} from Table ${currentTable} to seat with household`,
+            );
+          }
+        });
+      }
+    }
+  });
+
+  // Assign all guests to table
+  guestsToAdd.forEach((guestName) => {
+    assignGuestToTable(guestName, tableNumber);
   });
 
   bulkSelectedGuests.clear();
@@ -923,7 +1332,7 @@ function assignBulkGuestsToTable(tableNumber) {
 
   updateUnseatedPanel();
   console.log(
-    `✅ ${selectedGuests.length} guests assigned to Table ${tableNumber}`,
+    `✅ ${guestsToAdd.length} guests assigned to Table ${tableNumber}`,
   );
 }
 
