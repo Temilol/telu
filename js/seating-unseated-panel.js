@@ -491,11 +491,23 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
   `;
   menu.appendChild(tablesContainer);
 
+  const guestsNeeded = householdMembers && householdMembers.length > 1
+    ? householdMembers.length
+    : 1;
+  let hiddenCount = 0;
+
   seatingData.tables.forEach((table) => {
     const tableNum = table.number || "?";
     const guestCount =
       table.guests && Array.isArray(table.guests) ? table.guests.length : 0;
     const maxGuests = Number(table.maxGuests) || 10;
+    const availableSpace = maxGuests - guestCount;
+
+    if (availableSpace < guestsNeeded) {
+      hiddenCount++;
+      return;
+    }
+
     const btn = document.createElement("button");
     btn.innerHTML = `Table ${tableNum} (${guestCount}/${maxGuests})`;
     btn.style.cssText = `
@@ -520,6 +532,18 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
     };
     tablesContainer.appendChild(btn);
   });
+
+  if (tablesContainer.children.length === 0) {
+    const noTables = document.createElement("div");
+    noTables.style.cssText = "padding: 20px; text-align: center; color: #999; font-size: 0.9rem;";
+    noTables.textContent = `No tables with ${guestsNeeded} available seat${guestsNeeded === 1 ? "" : "s"}`;
+    tablesContainer.appendChild(noTables);
+  } else if (hiddenCount > 0) {
+    const note = document.createElement("div");
+    note.style.cssText = "padding: 8px 12px; text-align: center; color: #999; font-size: 0.8rem; font-style: italic;";
+    note.textContent = `${hiddenCount} table${hiddenCount === 1 ? "" : "s"} hidden (not enough space)`;
+    tablesContainer.appendChild(note);
+  }
 
   // Cancel button - fixed outside scrollable area
   const cancelBtn = document.createElement("button");
@@ -756,11 +780,21 @@ function createBulkTableMenu(callback, selectedCount = null) {
   `;
   menu.appendChild(tablesContainer);
 
+  const guestsNeeded = selectedCount || 1;
+  let hiddenCount = 0;
+
   seatingData.tables.forEach((table) => {
     const tableNum = table.number || "?";
     const guestCount =
       table.guests && Array.isArray(table.guests) ? table.guests.length : 0;
     const maxGuests = Number(table.maxGuests) || 10;
+    const availableSpace = maxGuests - guestCount;
+
+    if (availableSpace < guestsNeeded) {
+      hiddenCount++;
+      return;
+    }
+
     const btn = document.createElement("button");
     btn.innerHTML = `Table ${tableNum} (${guestCount}/${maxGuests})`;
     btn.style.cssText = `
@@ -785,6 +819,18 @@ function createBulkTableMenu(callback, selectedCount = null) {
     };
     tablesContainer.appendChild(btn);
   });
+
+  if (tablesContainer.children.length === 0) {
+    const noTables = document.createElement("div");
+    noTables.style.cssText = "padding: 20px; text-align: center; color: #999; font-size: 0.9rem;";
+    noTables.textContent = `No tables with ${guestsNeeded} available seat${guestsNeeded === 1 ? "" : "s"}`;
+    tablesContainer.appendChild(noTables);
+  } else if (hiddenCount > 0) {
+    const note = document.createElement("div");
+    note.style.cssText = "padding: 8px 12px; text-align: center; color: #999; font-size: 0.8rem; font-style: italic;";
+    note.textContent = `${hiddenCount} table${hiddenCount === 1 ? "" : "s"} hidden (not enough space)`;
+    tablesContainer.appendChild(note);
+  }
 
   const cancelBtn = document.createElement("button");
   cancelBtn.textContent = "Cancel";
