@@ -64,7 +64,7 @@ async function exportViewPNG() {
       button.disabled = false;
     }, 2000);
   } catch (error) {
-    console.error("PNG export failed:", error);
+    devError("PNG export failed:", error);
     button.textContent = "❌ Export Failed";
     setTimeout(() => {
       button.textContent = originalText;
@@ -122,7 +122,7 @@ async function exportViewSVG() {
       button.disabled = false;
     }, 2000);
   } catch (error) {
-    console.error("SVG export failed:", error);
+    devError("SVG export failed:", error);
     button.textContent = "❌ Export Failed";
     setTimeout(() => {
       button.textContent = originalText;
@@ -314,9 +314,9 @@ async function exportSeatingChartAsSVG() {
         button.disabled = false;
       }, 2000);
     }
-    console.log("✓ Seating chart exported as SVG");
+    devLog("✓ Seating chart exported as SVG");
   } catch (error) {
-    console.error("SVG export failed:", error);
+    devError("SVG export failed:", error);
     if (button) {
       button.textContent = "❌ Export Failed";
       setTimeout(() => {
@@ -344,7 +344,7 @@ function exportViewPDF() {
       button.disabled = false;
     }, 2000);
   } catch (error) {
-    console.error("PDF export failed:", error);
+    devError("PDF export failed:", error);
     button.textContent = "❌ Export Failed";
     setTimeout(() => {
       button.textContent = originalText;

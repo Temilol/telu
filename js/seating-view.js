@@ -14,63 +14,70 @@ let seatingData = {
 async function loadSeatingChart() {
   try {
     if (!window.firebaseInitialized) {
-      document.getElementById("content").innerHTML = '<p style="color: red;">❌ Firebase not initialized</p>';
+      document.getElementById("content").innerHTML =
+        '<p style="color: red;">❌ Firebase not initialized</p>';
       return;
     }
 
-    const collectionName = window.currentEventId.includes("trad") ? "seating-trad" : "seating-white";
+    const collectionName = window.currentEventId.includes("trad")
+      ? "seating-trad"
+      : "seating-white";
     const docId = "wedding-seating-chart";
-    console.log(`Loading from collection: ${collectionName}, doc: ${docId}`);
-    
-    const docRef = window.firebaseDoc(
-      window.firebaseDB,
-      collectionName,
-      docId
-    );
+    devLog(`Loading from collection: ${collectionName}, doc: ${docId}`);
+
+    const docRef = window.firebaseDoc(window.firebaseDB, collectionName, docId);
     const docSnap = await window.firebaseGetDoc(docRef);
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      console.log("Document data:", data);
+      devLog("Document data:", data);
       seatingData.tables = data.tables || [];
       displaySeatingChart();
     } else {
-      console.log(`Document not found. Tried: ${collectionName}/${docId}`);
-      document.getElementById("content").innerHTML = '<p style="text-align: center; padding: 40px;">No seating chart data found. Please create tables in the editor first.</p>';
+      devLog(`Document not found. Tried: ${collectionName}/${docId}`);
+      document.getElementById("content").innerHTML =
+        '<p style="text-align: center; padding: 40px;">No seating chart data found. Please create tables in the editor first.</p>';
     }
   } catch (error) {
-    console.error("Error loading seating chart:", error);
-    document.getElementById("content").innerHTML = '<p style="color: red;">❌ Error loading seating chart: ' + error.message + '</p>';
+    devError("Error loading seating chart:", error);
+    document.getElementById("content").innerHTML =
+      '<p style="color: red;">❌ Error loading seating chart: ' +
+      error.message +
+      "</p>";
   }
 }
 
 // Display seating chart as grid
 function displaySeatingChart() {
   const content = document.getElementById("content");
-  
+
   if (seatingData.tables.length === 0) {
-    content.innerHTML = '<p style="text-align: center; padding: 40px;">No tables configured yet.</p>';
+    content.innerHTML =
+      '<p style="text-align: center; padding: 40px;">No tables configured yet.</p>';
     return;
   }
 
   // Sort tables by number
-  const sortedTables = [...seatingData.tables].sort((a, b) => a.number - b.number);
+  const sortedTables = [...seatingData.tables].sort(
+    (a, b) => a.number - b.number,
+  );
 
   let html = '<div class="seating-grid">';
 
-  sortedTables.forEach(table => {
+  sortedTables.forEach((table) => {
     html += `
       <div class="table-card">
         <div class="table-number">Table ${table.number}</div>
         <ul class="guests-list">
     `;
-    
+
     if (table.guests && table.guests.length > 0) {
-      table.guests.forEach(guest => {
+      table.guests.forEach((guest) => {
         html += `<li class="guest-item">${guest}</li>`;
       });
     } else {
-      html += '<li class="guest-item" style="color: #bbb; font-style: italic;">No guests assigned</li>';
+      html +=
+        '<li class="guest-item" style="color: #bbb; font-style: italic;">No guests assigned</li>';
     }
 
     html += `
@@ -79,17 +86,17 @@ function displaySeatingChart() {
     `;
   });
 
-  html += '</div>';
+  html += "</div>";
 
   content.innerHTML = html;
 }
 
 // Initialize on page load with retry for Firebase initialization
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   // Retry logic to wait for Firebase to be initialized
   let retries = 0;
   const maxRetries = 50; // 5 seconds max (50 * 100ms)
-  
+
   const retryLoad = () => {
     if (window.firebaseInitialized) {
       loadSeatingChart();
@@ -97,9 +104,10 @@ document.addEventListener("DOMContentLoaded", function() {
       retries++;
       setTimeout(retryLoad, 100);
     } else {
-      document.getElementById("content").innerHTML = '<p style="color: red;">❌ Failed to initialize Firebase. Please refresh the page.</p>';
+      document.getElementById("content").innerHTML =
+        '<p style="color: red;">❌ Failed to initialize Firebase. Please refresh the page.</p>';
     }
   };
-  
+
   retryLoad();
 });

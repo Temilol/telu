@@ -36,7 +36,7 @@ window.updateGuestLookup = updateGuestLookup;
 document.addEventListener("DOMContentLoaded", async function () {
   // Skip auto-load if we're on a guest-facing page (find-seat)
   if (window.skipAutoLoadSeating) {
-    console.log("⏭️  Skipping auto-load seating (guest page will handle it)");
+    devLog("⏭️  Skipping auto-load seating (guest page will handle it)");
     return;
   }
 
@@ -86,7 +86,8 @@ function createTableElement(table) {
   // Edit button
   const editBtn = document.createElement("div");
   editBtn.className = "edit-table-btn";
-  editBtn.innerHTML = "✏️";
+  editBtn.innerHTML =
+    '<i class="fa-solid fa-pen-to-square" style="color: black;"></i>';
   editBtn.title = "Edit table";
   editBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -150,7 +151,8 @@ function createTableElement(table) {
   // View Guests button
   const viewGuestsBtn = document.createElement("button");
   viewGuestsBtn.className = "view-guests-btn";
-  viewGuestsBtn.innerHTML = "👁️";
+  viewGuestsBtn.style.color = "black";
+  viewGuestsBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
   viewGuestsBtn.title = "View guests at this table";
   viewGuestsBtn.addEventListener("click", (e) => {
     e.stopPropagation();

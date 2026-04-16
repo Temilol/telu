@@ -34,7 +34,7 @@ class HouseholdManager {
       this.householdMap.get(householdId).push(guest);
     });
 
-    console.log(`👥 Built household map: ${this.householdMap.size} households`);
+    devLog(`👥 Built household map: ${this.householdMap.size} households`);
   }
 
   /**
