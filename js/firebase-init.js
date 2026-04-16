@@ -25,9 +25,9 @@ try {
   window.firebaseGetDocs = getDocs;
   window.firebaseInitialized = true;
 
-  devLog("✓ Firebase initialized successfully");
+  (window.devLog || console.log)("✓ Firebase initialized successfully");
 } catch (error) {
-  devError("❌ Firebase initialization error:", error);
-  devError("Stack trace:", error.stack);
+  (window.devError || console.error)("❌ Firebase initialization error:", error);
+  (window.devError || console.error)("Stack trace:", error.stack);
   window.firebaseInitialized = false;
 }
