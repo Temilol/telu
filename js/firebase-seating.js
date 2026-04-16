@@ -58,7 +58,7 @@ function updateSaveSpinner() {
 // Get event-specific collection name based on currentEventId
 function getSeatingCollectionName() {
   if (typeof window.currentEventId === "undefined") {
-    console.warn("⚠️  currentEventId not set, using default collection");
+    devWarn("⚠️  currentEventId not set, using default collection");
     return "seating-charts";
   }
 
@@ -77,13 +77,13 @@ const FIREBASE_DOCUMENT_ID = "wedding-seating-chart";
 // Load seating data from Firebase
 async function loadFromFirebase() {
   if (!window.firebaseInitialized) {
-    console.log("Firebase not initialized, loading from local file");
+    devLog("Firebase not initialized, loading from local file");
     return false;
   }
 
   try {
     const collectionName = getSeatingCollectionName();
-    console.log(`📍 Loading seating from collection: ${collectionName}`);
+    devLog(`📍 Loading seating from collection: ${collectionName}`);
 
     const docRef = window.firebaseDoc(
       window.firebaseDB,
@@ -97,7 +97,7 @@ async function loadFromFirebase() {
       seatingData.tables = data.tables || [];
       seatingData.headTable = data.headTable || { x: 50, y: 8 };
       seatingData.danceFloor = data.danceFloor || { x: 50, y: 92 };
-      console.log(`✓ Loaded seating data from Firebase (${collectionName})`);
+      devLog(`✓ Loaded seating data from Firebase (${collectionName})`);
 
       // Update guest statistics if function exists
       if (typeof updateGuestStats === "function") {
@@ -106,11 +106,11 @@ async function loadFromFirebase() {
 
       return true;
     } else {
-      console.log("No Firebase data found, using default");
+      devLog("No Firebase data found, using default");
       return false;
     }
   } catch (error) {
-    console.error("Error loading from Firebase:", error);
+    devError("Error loading from Firebase:", error);
     return false;
   }
 }
@@ -142,14 +142,14 @@ async function saveToFirebase() {
     };
 
     // Log the data being sent to Firebase for debugging
-    console.log("Sending to Firebase:", JSON.stringify(exportData, null, 2));
+    devLog("Sending to Firebase:", JSON.stringify(exportData, null, 2));
 
     // Check for any undefined values before sending
     const hasUndefined = (obj, path = "") => {
       for (const key in obj) {
         const currentPath = path ? `${path}.${key}` : key;
         if (obj[key] === undefined) {
-          console.error(`Found undefined at: ${currentPath}`);
+          devError(`Found undefined at: ${currentPath}`);
           return true;
         }
         if (typeof obj[key] === "object" && obj[key] !== null) {
@@ -162,7 +162,7 @@ async function saveToFirebase() {
     };
 
     if (hasUndefined(exportData)) {
-      console.error("Data contains undefined values! Fix before send.");
+      devError("Data contains undefined values! Fix before send.");
       alert(
         "❌ Data validation failed: undefined values detected. Check console.",
       );
@@ -178,12 +178,12 @@ async function saveToFirebase() {
     );
     await window.firebaseSetDoc(docRef, exportData);
 
-    console.log(`✓ Saved to Firebase (${collectionName})`);
+    devLog(`✓ Saved to Firebase (${collectionName})`);
     isSavingToFirebase = false;
     updateSaveSpinner();
     return true;
   } catch (error) {
-    console.error("Error saving to Firebase:", error);
+    devError("Error saving to Firebase:", error);
     alert(`❌ Failed to save to Firebase: ${error.message}`);
     isSavingToFirebase = false;
     updateSaveSpinner();

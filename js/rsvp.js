@@ -729,7 +729,7 @@ async function loadExistingRSVP(guestId) {
 
     return null;
   } catch (error) {
-    console.error("Error loading existing RSVP:", error);
+    devError("Error loading existing RSVP:", error);
     return null;
   }
 }
@@ -738,7 +738,7 @@ async function loadExistingRSVP(guestId) {
 async function sendToGoogleSheets(rsvp) {
   // Check if Google Script URL is configured
   if (GOOGLE_SCRIPT_URL === "YOUR_WEB_APP_URL_HERE") {
-    console.warn(
+    devWarn(
       "Google Sheets integration not configured. Data saved to localStorage only.",
     );
     return;
@@ -767,9 +767,9 @@ async function sendToGoogleSheets(rsvp) {
       body: JSON.stringify(sheetData),
     });
 
-    console.log("RSVP sent to Google Sheets successfully");
+    devLog("RSVP sent to Google Sheets successfully");
   } catch (error) {
-    console.error("Error sending to Google Sheets:", error);
+    devError("Error sending to Google Sheets:", error);
     // Data is still saved in localStorage as backup
   }
 }

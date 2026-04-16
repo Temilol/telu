@@ -36,7 +36,7 @@ window.updateGuestLookup = updateGuestLookup;
 document.addEventListener("DOMContentLoaded", async function () {
   // Skip auto-load if we're on a guest-facing page (find-seat)
   if (window.skipAutoLoadSeating) {
-    console.log("⏭️  Skipping auto-load seating (guest page will handle it)");
+    devLog("⏭️  Skipping auto-load seating (guest page will handle it)");
     return;
   }
 

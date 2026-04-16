@@ -1,8 +1,15 @@
 // Firebase SDK initialization - shared across all seating pages
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { firebaseConfig } from './firebase-config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
 
 try {
   // Initialize Firebase
@@ -17,10 +24,10 @@ try {
   window.firebaseCollection = collection;
   window.firebaseGetDocs = getDocs;
   window.firebaseInitialized = true;
-  
-  console.log("✓ Firebase initialized successfully");
+
+  devLog("✓ Firebase initialized successfully");
 } catch (error) {
-  console.error("❌ Firebase initialization error:", error);
-  console.error("Stack trace:", error.stack);
+  devError("❌ Firebase initialization error:", error);
+  devError("Stack trace:", error.stack);
   window.firebaseInitialized = false;
 }

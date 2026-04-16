@@ -19,9 +19,19 @@ if (typeof window.isDev === 'undefined') {
   window.isDev = isDevelopment();
 }
 
-// Helper function for dev logging (safe fallback if called before load)
+// Helper functions for dev logging (safe fallback if called before load)
 if (typeof window.devLog === 'undefined') {
   window.devLog = function(...args) {
     if (window.isDev) console.log(...args);
+  };
+}
+if (typeof window.devWarn === 'undefined') {
+  window.devWarn = function(...args) {
+    if (window.isDev) console.warn(...args);
+  };
+}
+if (typeof window.devError === 'undefined') {
+  window.devError = function(...args) {
+    if (window.isDev) console.error(...args);
   };
 }

@@ -5,7 +5,7 @@
 // Determine which collection to use based on the current event
 function getGuestCollectionName() {
   if (typeof window.currentEventId === "undefined") {
-    console.warn("⚠️  currentEventId not set, using default collection");
+    devWarn("⚠️  currentEventId not set, using default collection");
     return "guests";
   }
 
@@ -21,13 +21,13 @@ function getGuestCollectionName() {
 // Fetch all guests from Firebase for the current event
 async function loadGuestsFromFirebase() {
   if (!window.firebaseInitialized) {
-    console.log("Firebase not initialized, using fallback guests");
+    devLog("Firebase not initialized, using fallback guests");
     return getFallbackGuests();
   }
 
   try {
     const collectionName = getGuestCollectionName();
-    console.log(`📍 Loading guests from collection: ${collectionName}`);
+    devLog(`📍 Loading guests from collection: ${collectionName}`);
 
     const querySnapshot = await window.firebaseGetDocs(
       window.firebaseCollection(window.firebaseDB, collectionName),
@@ -63,12 +63,12 @@ async function loadGuestsFromFirebase() {
 
     // Sort by name
     guests.sort((a, b) => a.name.localeCompare(b.name));
-    console.log(
+    devLog(
       `✓ Loaded ${guests.length} guests from Firebase (${collectionName})`,
     );
     return guests;
   } catch (error) {
-    console.error("Error loading guests from Firebase:", error);
+    devError("Error loading guests from Firebase:", error);
     return getFallbackGuests();
   }
 }
@@ -77,13 +77,13 @@ async function loadGuestsFromFirebase() {
 // Supports uploading to event-specific collections
 async function uploadGuestsToFirebase(guests, eventName = "trad") {
   if (!window.firebaseInitialized) {
-    console.error("❌ Firebase not initialized");
+    devError("❌ Firebase not initialized");
     alert("Firebase not initialized");
     return false;
   }
 
   if (!guests || guests.length === 0) {
-    console.error("❌ No guests to upload");
+    devError("❌ No guests to upload");
     alert("No guests to upload");
     return false;
   }
@@ -96,7 +96,7 @@ async function uploadGuestsToFirebase(guests, eventName = "trad") {
         : "guests";
 
   try {
-    console.log(
+    devLog(
       `Starting upload of ${guests.length} guests to ${collectionName}...`,
     );
 
@@ -121,10 +121,10 @@ async function uploadGuestsToFirebase(guests, eventName = "trad") {
         additionalGuests: guest.additionalGuests || [],
       });
 
-      console.log(`✓ Uploaded: ${guestName}`);
+      devLog(`✓ Uploaded: ${guestName}`);
     }
 
-    console.log(
+    devLog(
       `✅ Successfully uploaded ${guests.length} guests to ${collectionName}`,
     );
     alert(
@@ -132,7 +132,7 @@ async function uploadGuestsToFirebase(guests, eventName = "trad") {
     );
     return true;
   } catch (error) {
-    console.error("❌ Error uploading guests to Firebase:", error);
+    devError("❌ Error uploading guests to Firebase:", error);
     alert(`❌ Error uploading guests: ${error.message}`);
     return false;
   }
@@ -169,7 +169,7 @@ function getFallbackGuests() {
     });
 
     guests.sort((a, b) => a.name.localeCompare(b.name));
-    console.log(`✓ Loaded ${guests.length} guests from RSVP data`);
+    devLog(`✓ Loaded ${guests.length} guests from RSVP data`);
     return guests;
   }
 

@@ -166,7 +166,7 @@ function exportSeatingChartAsSVG() {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 
-  console.log("✓ Seating chart exported as SVG");
+  devLog("✓ Seating chart exported as SVG");
 }
 
 // Expose globally
