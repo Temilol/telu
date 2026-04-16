@@ -127,6 +127,11 @@ async function saveToFirebase() {
     return false;
   }
 
+  // Check for unloaded remote changes before saving
+  if (window.realtimeSync && !window.realtimeSync.checkBeforeSave()) {
+    return false;
+  }
+
   try {
     isSavingToFirebase = true;
     updateSaveSpinner();
@@ -182,6 +187,11 @@ async function saveToFirebase() {
       FIREBASE_DOCUMENT_ID,
     );
     await window.firebaseSetDoc(docRef, exportData);
+
+    // Tell realtime sync this was our own save so it ignores the echo
+    if (window.realtimeSync) {
+      window.realtimeSync.markOwnSave(exportData.lastUpdated);
+    }
 
     devLog(`✓ Saved to Firebase (${collectionName})`);
     isSavingToFirebase = false;

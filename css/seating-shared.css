@@ -1396,3 +1396,79 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Remote change notification banner ── */
+#remote-change-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: #1565C0;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2147483647;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  animation: remoteBannerSlideIn 0.3s ease-out;
+}
+
+#remote-change-banner.remote-change-banner-exit {
+  animation: remoteBannerSlideOut 0.3s ease-out forwards;
+}
+
+.remote-change-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remote-change-text i {
+  font-size: 15px;
+}
+
+.remote-change-btn {
+  background: #fff;
+  color: #1565C0;
+  border: none;
+  padding: 5px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.remote-change-btn:hover {
+  background: #E3F2FD;
+}
+
+.remote-change-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 14px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.remote-change-dismiss:hover {
+  color: #fff;
+}
+
+@keyframes remoteBannerSlideIn {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes remoteBannerSlideOut {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}

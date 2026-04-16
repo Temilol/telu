@@ -8,6 +8,7 @@ import {
   setDoc,
   collection,
   getDocs,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -23,6 +24,7 @@ try {
   window.firebaseSetDoc = setDoc;
   window.firebaseCollection = collection;
   window.firebaseGetDocs = getDocs;
+  window.firebaseOnSnapshot = onSnapshot;
   window.firebaseInitialized = true;
 
   (window.devLog || console.log)("✓ Firebase initialized successfully");
