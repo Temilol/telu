@@ -51,7 +51,7 @@ function setupZoomControls() {
   if (floatingAddBtn) {
     floatingAddBtn.addEventListener("click", () => {
       // Trigger the same function as the regular Add Table button
-      if (typeof window.openModal === 'function') {
+      if (typeof window.openModal === "function") {
         window.openModal();
       }
     });
@@ -187,14 +187,17 @@ function updateTransform() {
 function toggleFullscreen() {
   const venueContainer = document.getElementById("venueContainer");
   const fullscreenBtn = document.getElementById("fullscreenBtn");
-  
+
   if (!document.fullscreenElement) {
-    venueContainer.requestFullscreen().then(() => {
-      fullscreenBtn.textContent = "⊗";
-      fullscreenBtn.title = "Exit Fullscreen";
-    }).catch(err => {
-      console.error(`Error attempting to enable fullscreen: ${err.message}`);
-    });
+    venueContainer
+      .requestFullscreen()
+      .then(() => {
+        fullscreenBtn.textContent = "⊗";
+        fullscreenBtn.title = "Exit Fullscreen";
+      })
+      .catch((err) => {
+        devError(`Error attempting to enable fullscreen: ${err.message}`);
+      });
   } else {
     document.exitFullscreen().then(() => {
       fullscreenBtn.textContent = "⛶";

@@ -104,6 +104,11 @@ async function loadFromFirebase() {
         updateGuestStats();
       }
 
+      // Refresh unseated panel now that seating data is loaded
+      if (typeof updateUnseatedPanel === "function") {
+        updateUnseatedPanel();
+      }
+
       return true;
     } else {
       devLog("No Firebase data found, using default");

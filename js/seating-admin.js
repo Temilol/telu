@@ -4,6 +4,7 @@
 const DEFAULT_MAX_GUESTS = 10; // Default max guests per table
 let allGuests = []; // Cache for guest list
 let currentTableMaxGuests = DEFAULT_MAX_GUESTS; // Track current table's max
+let _fromBulkFlow = false; // Track if modal was opened from bulk/household flow
 
 // Household selection state
 let pendingHouseholdSelection = null; // { guestName, selectedGuestsMap, tagsContainer, tableNumber, tableMaxGuests }
@@ -81,6 +82,7 @@ async function openModal(tableNumber = null) {
   }
 
   // Clear previous state
+  _fromBulkFlow = false;
   guestSearchInput.value = "";
   suggestionsDiv.innerHTML = "";
   suggestionsDiv.classList.remove("show");
@@ -147,6 +149,7 @@ async function openModal(tableNumber = null) {
       window.pendingGuestsForNewTable &&
       window.pendingGuestsForNewTable.length > 0
     ) {
+      _fromBulkFlow = true;
       window.pendingGuestsForNewTable.forEach((guestName) => {
         const guest = allGuests.find(
           (g) => g.name.toLowerCase() === guestName.toLowerCase(),
@@ -331,10 +334,6 @@ async function openModal(tableNumber = null) {
   const saveBtn = document.querySelector(".btn-save");
   if (saveBtn) {
     devLog("🔵 Adding click listener to save button");
-    devLog("  Button element:", saveBtn);
-    devLog("  Button text:", saveBtn.textContent);
-    devLog("  Button classList:", saveBtn.className);
-    devLog("  Button disabled:", saveBtn.disabled);
 
     // Remove old listeners by cloning
     const newSaveBtn = saveBtn.cloneNode(true);
@@ -348,7 +347,8 @@ async function openModal(tableNumber = null) {
       devLog("  Event:", e);
       e.preventDefault();
       devLog("📝 Form about to submit via button click");
-      tableForm.dispatchEvent(new Event("submit", { bubbles: true }));
+      const form = document.getElementById("tableForm");
+      form.dispatchEvent(new Event("submit", { bubbles: true }));
     });
 
     // Also test if button is clickable
@@ -461,13 +461,21 @@ function closeModal() {
   modal.classList.remove("show");
   document.getElementById("tableForm").reset();
   document.getElementById("tableNumber").disabled = false;
+
+  // Clear inline validation state
+  const errorDiv = document.getElementById("tableNumberError");
+  if (errorDiv) errorDiv.style.display = "none";
+  const saveBtn = document.querySelector(".btn-save");
+  if (saveBtn) saveBtn.disabled = false;
 }
 
 // Get next available table number
 function getNextTableNumber() {
   if (seatingData.tables.length === 0) return 1;
-  const maxNumber = Math.max(...seatingData.tables.map((t) => t.number));
-  return maxNumber + 1;
+  const usedNumbers = new Set(seatingData.tables.map((t) => t.number));
+  let next = 1;
+  while (usedNumbers.has(next)) next++;
+  return next;
 }
 
 // Calculate starting position for new table to avoid stacking
@@ -500,7 +508,6 @@ async function saveTable() {
 
   // Log form element
   const tableForm = document.getElementById("tableForm");
-  devLog("  Form element:", tableForm ? "FOUND" : "NOT FOUND");
 
   // Log all input fields in the form
   const tableNumberInput = document.getElementById("tableNumber");
@@ -597,17 +604,42 @@ async function saveTable() {
   );
 
   if (duplicates.length > 0) {
-    const tableAssignments = duplicates
-      .map((guest) => {
-        const table = findGuestTable(guest, seatingData.tables);
-        return `${guest} (Table ${table})`;
-      })
-      .join("\n");
-    devLog(`❌ Duplicate guests found: ${duplicates.join(", ")}`);
-    alert(
-      `The following guests are already assigned:\n\n${tableAssignments}\n\nPlease remove them before saving.`,
-    );
-    return;
+    // If guests came from bulk/household flow, auto-reassign instead of blocking
+    if (_fromBulkFlow) {
+      devLog(
+        `🔄 Auto-reassigning ${duplicates.length} already-seated guests from bulk/household flow`,
+      );
+      duplicates.forEach((guest) => {
+        const oldTable = findGuestTable(guest, seatingData.tables);
+        if (typeof removeGuestFromAllTables === "function") {
+          removeGuestFromAllTables(guest, seatingData.tables);
+        } else {
+          // Fallback: remove manually
+          seatingData.tables.forEach((table) => {
+            if (table.guests) {
+              table.guests = table.guests.filter(
+                (g) => g.toLowerCase() !== guest.toLowerCase(),
+              );
+            }
+          });
+        }
+        if (oldTable && typeof refreshTable === "function") {
+          refreshTable(oldTable);
+        }
+      });
+    } else {
+      const tableAssignments = duplicates
+        .map((guest) => {
+          const table = findGuestTable(guest, seatingData.tables);
+          return `${guest} (Table ${table})`;
+        })
+        .join("\n");
+      devLog(`❌ Duplicate guests found: ${duplicates.join(", ")}`);
+      alert(
+        `The following guests are already assigned:\n\n${tableAssignments}\n\nPlease remove them before saving.`,
+      );
+      return;
+    }
   }
 
   // Check if editing existing table
@@ -655,6 +687,14 @@ async function saveTable() {
     // Only close modal after successful Firebase save
     devLog("🟢 Firebase save successful, closing modal");
     closeModal();
+
+    // If this came from bulk/household flow, clear bulk state and refresh panel
+    if (_fromBulkFlow) {
+      _fromBulkFlow = false;
+      if (typeof window.resetBulkMode === "function") {
+        window.resetBulkMode();
+      }
+    }
   } catch (error) {
     devLog("❌ Error during Firebase save:", error);
     // Modal remains open so user can retry
@@ -821,6 +861,11 @@ async function loadAllGuests() {
 
   // Update guest statistics
   updateGuestStats();
+
+  // Refresh unseated panel now that guests are loaded
+  if (typeof updateUnseatedPanel === "function") {
+    updateUnseatedPanel();
+  }
 }
 
 // ========== GUEST STATISTICS ==========

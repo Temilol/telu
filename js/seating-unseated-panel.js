@@ -14,7 +14,7 @@ window.addEventListener("load", function () {
 });
 
 function initUnseatedPanel() {
-  console.log("🔧 Initializing unseated panel...");
+  devLog("🔧 Initializing unseated panel...");
 
   // Get all elements
   const drawer = document.getElementById("unseatedPanelDrawer");
@@ -27,12 +27,12 @@ function initUnseatedPanel() {
   const bulkAssignBtn = document.getElementById("bulkAssignBtn");
   const bulkSection = document.getElementById("bulkControlsSection");
 
-  console.log("  drawer:", drawer ? "✓" : "✗");
-  console.log("  openBtn:", openBtn ? "✓" : "✗");
-  console.log("  closeBtn:", closeBtn ? "✓" : "✗");
+  devLog("  drawer:", drawer ? "✓" : "✗");
+  devLog("  openBtn:", openBtn ? "✓" : "✗");
+  devLog("  closeBtn:", closeBtn ? "✓" : "✗");
 
   if (!drawer) {
-    console.warn("❌ Unseated panel elements not found");
+    devWarn("❌ Unseated panel elements not found");
     return;
   }
 
@@ -58,10 +58,10 @@ function initUnseatedPanel() {
   deselectAllBtn?.addEventListener("click", deselectAllGuests);
 
   if (bulkAssignBtn) {
-    console.log("✅ bulk assign btn found, attaching listener");
+    devLog("✅ bulk assign btn found, attaching listener");
     bulkAssignBtn.addEventListener("click", handleBulkAssign);
   } else {
-    console.warn("❌ bulk assign btn NOT found");
+    devWarn("❌ bulk assign btn NOT found");
   }
 
   // Tab controls
@@ -86,7 +86,7 @@ function initUnseatedPanel() {
 
   // Initial render
   updateUnseatedPanel();
-  console.log("✅ Unseated panel initialized successfully");
+  devLog("✅ Unseated panel initialized successfully");
 }
 
 // Open panel
@@ -116,15 +116,36 @@ function closePanel() {
 }
 
 // Update panel with latest data
-function updateUnseatedPanel() {
-  console.log("🔍 updateUnseatedPanel() called");
-  console.log("  seatingData:", typeof seatingData !== "undefined" ? "✓" : "✗");
-  console.log("  allGuests:", typeof allGuests !== "undefined" ? "✓" : "✗");
+let _unseatedPanelRetryCount = 0;
+const _UNSEATED_PANEL_MAX_RETRIES = 20;
+const _UNSEATED_PANEL_RETRY_MS = 500;
 
-  if (typeof seatingData === "undefined" || typeof allGuests === "undefined") {
-    console.warn("⏳ Waiting for seatingData/allGuests to load...");
+function updateUnseatedPanel() {
+  devLog("🔍 updateUnseatedPanel() called");
+
+  const hasSeatingData =
+    typeof seatingData !== "undefined" && !!seatingData.tables;
+  const hasGuests = typeof allGuests !== "undefined" && allGuests.length > 0;
+
+  devLog(`  seatingData: ${hasSeatingData ? "✓" : "✗ (not loaded)"}`);
+  devLog(
+    `  allGuests: ${hasGuests ? `✓ (${allGuests.length})` : "✗ (not loaded)"}`,
+  );
+
+  if (!hasSeatingData || !hasGuests) {
+    if (_unseatedPanelRetryCount < _UNSEATED_PANEL_MAX_RETRIES) {
+      _unseatedPanelRetryCount++;
+      devWarn(
+        `⏳ Waiting for data to load... (retry ${_unseatedPanelRetryCount}/${_UNSEATED_PANEL_MAX_RETRIES})`,
+      );
+      setTimeout(updateUnseatedPanel, _UNSEATED_PANEL_RETRY_MS);
+    } else {
+      devWarn("❌ Gave up waiting for seatingData/allGuests after max retries");
+    }
     return;
   }
+
+  _unseatedPanelRetryCount = 0;
 
   // Get unseated guests
   const seatedNames = new Set();
@@ -150,21 +171,21 @@ function updateUnseatedPanel() {
   // Show/hide button
   const openBtn = document.getElementById("openUnseatedPanel");
   if (openBtn) {
-    console.log(
+    devLog(
       `  Unseated guests: ${unseatedGuestsList.length}, Panel open: ${panelOpen}`,
     );
     if (unseatedGuestsList.length === 0) {
       openBtn.style.display = "none";
-      console.log("  → Button hidden (no unseated guests)");
+      devLog("  → Button hidden (no unseated guests)");
       closePanel();
     } else if (!panelOpen) {
       openBtn.style.display = "flex";
       openBtn.style.justifyContent = "center";
       openBtn.style.alignItems = "center";
-      console.log("  → Button shown (unseated guests found)");
+      devLog("  → Button shown (unseated guests found)");
     }
   } else {
-    console.log("  ❌ openBtn not found!");
+    devLog("  ❌ openBtn not found!");
   }
 
   renderUnseatedList();
@@ -186,60 +207,54 @@ function renderUnseatedList() {
     );
   }
 
+  list.innerHTML = "";
+
   if (filtered.length === 0) {
-    list.innerHTML =
-      '<div style="padding: 20px 15px; text-align: center; color: #999; font-size: 0.9rem;">No unseated guests</div>';
+    const emptyDiv = document.createElement("div");
+    emptyDiv.style.cssText =
+      "padding: 20px 15px; text-align: center; color: #999; font-size: 0.9rem;";
+    emptyDiv.textContent = "No unseated guests";
+    list.appendChild(emptyDiv);
     return;
   }
 
-  list.innerHTML = filtered
-    .map((guest) => {
-      const isSelected = bulkSelectedGuests.has(guest.name.toLowerCase());
+  filtered.forEach((guest) => {
+    const isSelected = bulkSelectedGuests.has(guest.name.toLowerCase());
 
-      // Check if guest has household members
-      const hasHousehold =
-        typeof householdManager !== "undefined" &&
-        householdManager.getHouseholdMembers(guest.name).length > 1;
-      const householdIcon = hasHousehold ? "👨‍👩‍👧‍👦" : "";
+    // Check if guest has household members
+    const hasHousehold =
+      typeof householdManager !== "undefined" &&
+      householdManager.getHouseholdMembers(guest.name).length > 1;
 
-      if (isBulkMode) {
-        // Bulk mode: checkbox + guest name
-        return `
-          <div class="unseated-guest-row" data-name="${guest.name}"
-               style="display: flex; align-items: center; padding: 10px; margin-bottom: 6px; background: ${isSelected ? "#e8f5e9" : "white"}; border-radius: 4px; border: 1px solid #E9D6CF; cursor: pointer; transition: background 0.2s; font-size: 13px;">
-            <input type="checkbox" class="guest-checkbox" ${isSelected ? "checked" : ""} style="width: 18px; height: 18px; cursor: pointer; margin-right: 10px;">
-            <span style="flex: 1; font-weight: ${isSelected ? "600" : "500"}; color: #333;">${guest.name} ${householdIcon}</span>
-          </div>
-        `;
-      } else {
-        // Quick-add mode: guest name + action button
-        const buttonText = hasHousehold ? "👫 Assign" : "✚ Assign";
-        return `
-          <div class="unseated-guest-row" data-name="${guest.name}"
-               style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 6px; background: white; border-radius: 4px; border: 1px solid #E9D6CF; cursor: pointer; font-size: 13px;">
-            <span style="flex: 1; color: #333;"><strong>${guest.name}</strong> ${householdIcon}</span>
-            <button style="padding: 4px 10px; font-size: 12px; background: #f0c891; color: #3B2F2F; border: none; border-radius: 3px; cursor: pointer; white-space: nowrap; margin-left: 8px; font-weight: 500;">
-              ${buttonText}
-            </button>
-          </div>
-        `;
-      }
-    })
-    .join("");
+    const row = document.createElement("div");
+    row.className = "unseated-guest-row";
+    row.dataset.name = guest.name;
 
-  // Attach event listeners
-  if (isBulkMode) {
-    list.querySelectorAll(".unseated-guest-row").forEach((row) => {
-      const checkbox = row.querySelector(".guest-checkbox");
-      const guestName = row.dataset.name;
+    if (isBulkMode) {
+      // Bulk mode: checkbox + guest name
+      row.style.cssText = `display: flex; align-items: center; padding: 10px; margin-bottom: 6px; background: ${isSelected ? "#e8f5e9" : "white"}; border-radius: 4px; border: 1px solid #E9D6CF; cursor: pointer; transition: background 0.2s; font-size: 13px;`;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "guest-checkbox";
+      checkbox.checked = isSelected;
+      checkbox.style.cssText =
+        "width: 18px; height: 18px; cursor: pointer; margin-right: 10px;";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.style.cssText = `flex: 1; font-weight: ${isSelected ? "600" : "500"}; color: #333;`;
+      nameSpan.textContent = guest.name + (hasHousehold ? " 👨‍👩‍👧‍👦" : "");
+
+      row.appendChild(checkbox);
+      row.appendChild(nameSpan);
 
       // Checkbox change event
-      checkbox?.addEventListener("change", function (e) {
+      checkbox.addEventListener("change", function (e) {
         e.stopPropagation();
         if (this.checked) {
-          bulkSelectedGuests.add(guestName.toLowerCase());
+          bulkSelectedGuests.add(guest.name.toLowerCase());
         } else {
-          bulkSelectedGuests.delete(guestName.toLowerCase());
+          bulkSelectedGuests.delete(guest.name.toLowerCase());
         }
         updateBulkCount();
         renderUnseatedList();
@@ -249,29 +264,46 @@ function renderUnseatedList() {
       row.addEventListener("click", function (e) {
         if (e.target !== checkbox) {
           e.stopPropagation();
-          checkbox?.click();
+          checkbox.click();
         }
       });
-    });
-  } else {
-    // Quick-add mode
-    list.querySelectorAll(".unseated-guest-row").forEach((row) => {
-      const button = row.querySelector("button");
-      const guestName = row.dataset.name;
+    } else {
+      // Quick-add mode: guest name + action button
+      row.style.cssText =
+        "display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 6px; background: white; border-radius: 4px; border: 1px solid #E9D6CF; cursor: pointer; font-size: 13px;";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.style.cssText = "flex: 1; color: #333;";
+      const strong = document.createElement("strong");
+      strong.textContent = guest.name;
+      nameSpan.appendChild(strong);
+      if (hasHousehold) {
+        nameSpan.appendChild(document.createTextNode(" 👨‍👩‍👧‍👦"));
+      }
+
+      const button = document.createElement("button");
+      button.style.cssText =
+        "padding: 4px 10px; font-size: 12px; background: #f0c891; color: #3B2F2F; border: none; border-radius: 3px; cursor: pointer; white-space: nowrap; margin-left: 8px; font-weight: 500;";
+      button.textContent = hasHousehold ? "👫 Assign" : "✚ Assign";
+
+      row.appendChild(nameSpan);
+      row.appendChild(button);
 
       // Button click - assign guest
-      button?.addEventListener("click", function (e) {
+      button.addEventListener("click", function (e) {
         e.stopPropagation();
-        quickAddGuest(guestName);
+        quickAddGuest(guest.name);
       });
 
       // Row click - also triggers assign
       row.addEventListener("click", function (e) {
-        if (e.target === button) return; // Don't double-trigger
-        quickAddGuest(guestName);
+        if (e.target === button) return;
+        quickAddGuest(guest.name);
       });
-    });
-  }
+    }
+
+    list.appendChild(row);
+  });
 }
 
 // Quick-add a guest (with household seat-together option)
@@ -350,10 +382,13 @@ function assignUnseatedHouseholdToTable(
   });
 
   if (alreadySeated.length > 0) {
-    // Remove them from their current tables
+    // Remove them from their current tables and refresh those tables' UI
     alreadySeated.forEach((member) => {
       if (typeof removeGuestFromAllTables === "function") {
         removeGuestFromAllTables(member.name, seatingData.tables);
+      }
+      if (typeof refreshTable === "function") {
+        refreshTable(member.table);
       }
     });
   }
@@ -363,7 +398,7 @@ function assignUnseatedHouseholdToTable(
     (selectedTable) => {
       const table = seatingData.tables.find((t) => t.number === selectedTable);
       if (!table) {
-        console.error("❌ Table not found");
+        devError("❌ Table not found");
         return;
       }
 
@@ -384,7 +419,7 @@ function assignUnseatedHouseholdToTable(
         assignGuestToTable(member.name, selectedTable);
       });
 
-      console.log(
+      devLog(
         `✅ Seated ${totalCount} household members together at Table ${selectedTable}`,
       );
     },
@@ -404,7 +439,7 @@ function quickAddHouseholdToTable(guestName, householdMembers) {
   }
 
   if (typeof showHouseholdPrompt === "undefined") {
-    console.warn(
+    devWarn(
       "❌ Household modal not available, falling back to single guest seating",
     );
     quickAddSingleGuest(guestName);
@@ -491,9 +526,10 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
   `;
   menu.appendChild(tablesContainer);
 
-  const guestsNeeded = householdMembers && householdMembers.length > 1
-    ? householdMembers.length
-    : 1;
+  const guestsNeeded =
+    householdMembers && householdMembers.length > 1
+      ? householdMembers.length
+      : 1;
   let hiddenCount = 0;
 
   seatingData.tables.forEach((table) => {
@@ -509,7 +545,7 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
     }
 
     const btn = document.createElement("button");
-    btn.innerHTML = `Table ${tableNum} (${guestCount}/${maxGuests})`;
+    btn.textContent = `Table ${tableNum} (${guestCount}/${maxGuests})`;
     btn.style.cssText = `
       width: 100%;
       padding: 12px;
@@ -535,12 +571,14 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
 
   if (tablesContainer.children.length === 0) {
     const noTables = document.createElement("div");
-    noTables.style.cssText = "padding: 20px; text-align: center; color: #999; font-size: 0.9rem;";
+    noTables.style.cssText =
+      "padding: 20px; text-align: center; color: #999; font-size: 0.9rem;";
     noTables.textContent = `No tables with ${guestsNeeded} available seat${guestsNeeded === 1 ? "" : "s"}`;
     tablesContainer.appendChild(noTables);
   } else if (hiddenCount > 0) {
     const note = document.createElement("div");
-    note.style.cssText = "padding: 8px 12px; text-align: center; color: #999; font-size: 0.8rem; font-style: italic;";
+    note.style.cssText =
+      "padding: 8px 12px; text-align: center; color: #999; font-size: 0.8rem; font-style: italic;";
     note.textContent = `${hiddenCount} table${hiddenCount === 1 ? "" : "s"} hidden (not enough space)`;
     tablesContainer.appendChild(note);
   }
@@ -622,7 +660,7 @@ function assignGuestToTable(guestName, tableNumber) {
 
   const table = seatingData.tables.find((t) => t.number === tableNumber);
   if (!table) {
-    console.error("❌ Table not found");
+    devError("❌ Table not found");
     return;
   }
 
@@ -659,8 +697,24 @@ function assignGuestToTable(guestName, tableNumber) {
   // Refresh unseated panel
   updateUnseatedPanel();
 
-  console.log(`✅ ${guestName} added to Table ${tableNumber}`);
+  devLog(`✅ ${guestName} added to Table ${tableNumber}`);
 }
+
+// Reset bulk mode state — callable from other scripts (e.g. after saveTable in bulk flow)
+function resetBulkMode() {
+  bulkSelectedGuests.clear();
+  isBulkMode = false;
+  const bulkToggle = document.getElementById("bulkModeToggle");
+  const bulkSection = document.getElementById("bulkControlsSection");
+  if (bulkSection) bulkSection.style.display = "none";
+  if (bulkToggle) {
+    bulkToggle.textContent = "📋 Bulk";
+    bulkToggle.style.background = "#C68A65";
+    bulkToggle.style.color = "white";
+  }
+  updateUnseatedPanel();
+}
+window.resetBulkMode = resetBulkMode;
 
 // Toggle bulk mode
 function toggleBulkMode() {
@@ -734,7 +788,11 @@ function handleBulkAssign() {
 }
 
 // Create table menu for bulk assignment
-function createBulkTableMenu(callback, selectedCount = null, finalGuestNames = null) {
+function createBulkTableMenu(
+  callback,
+  selectedCount = null,
+  finalGuestNames = null,
+) {
   if (typeof seatingData === "undefined" || seatingData.tables.length === 0) {
     alert("No tables created yet.");
     return;
@@ -792,7 +850,7 @@ function createBulkTableMenu(callback, selectedCount = null, finalGuestNames = n
     }
 
     const btn = document.createElement("button");
-    btn.innerHTML = `Table ${tableNum} (${guestCount}/${maxGuests})`;
+    btn.textContent = `Table ${tableNum} (${guestCount}/${maxGuests})`;
     btn.style.cssText = `
       width: 100%;
       padding: 12px;
@@ -818,12 +876,14 @@ function createBulkTableMenu(callback, selectedCount = null, finalGuestNames = n
 
   if (tablesContainer.children.length === 0) {
     const noTables = document.createElement("div");
-    noTables.style.cssText = "padding: 20px; text-align: center; color: #999; font-size: 0.9rem;";
+    noTables.style.cssText =
+      "padding: 20px; text-align: center; color: #999; font-size: 0.9rem;";
     noTables.textContent = `No tables with ${guestsNeeded} available seat${guestsNeeded === 1 ? "" : "s"}`;
     tablesContainer.appendChild(noTables);
   } else if (hiddenCount > 0) {
     const note = document.createElement("div");
-    note.style.cssText = "padding: 8px 12px; text-align: center; color: #999; font-size: 0.8rem; font-style: italic;";
+    note.style.cssText =
+      "padding: 8px 12px; text-align: center; color: #999; font-size: 0.8rem; font-style: italic;";
     note.textContent = `${hiddenCount} table${hiddenCount === 1 ? "" : "s"} hidden (not enough space)`;
     tablesContainer.appendChild(note);
   }
@@ -955,9 +1015,7 @@ function computeBulkGuestData() {
     guestsToAdd: Array.from(guestsToAdd),
     householdGroups,
     selectedOnly: selectedGuests.map((gn) => {
-      const guest = unseatedGuestsList.find(
-        (g) => g.name.toLowerCase() === gn,
-      );
+      const guest = unseatedGuestsList.find((g) => g.name.toLowerCase() === gn);
       return guest ? guest.name : gn;
     }),
   };
@@ -1177,13 +1235,15 @@ function showBulkAssignmentConfirmation() {
             ${isExcluded ? "text-decoration: line-through;" : ""}
           `;
 
-          let label = `• ${memberName}`;
+          guestDiv.textContent = `• ${memberName}`;
           if (!isSelected) {
-            label += included
-              ? ' <span style="color: #C68A65; font-size: 0.8rem;">(household)</span>'
-              : ' <span style="color: #bbb; font-size: 0.8rem;">(excluded)</span>';
+            const tag = document.createElement("span");
+            tag.style.cssText = included
+              ? "color: #C68A65; font-size: 0.8rem;"
+              : "color: #bbb; font-size: 0.8rem;";
+            tag.textContent = included ? " (household)" : " (excluded)";
+            guestDiv.appendChild(tag);
           }
-          guestDiv.innerHTML = label;
           householdDiv.appendChild(guestDiv);
         });
 
@@ -1273,7 +1333,7 @@ function executeBulkAssignment(tableNumber, guestsToAdd, householdsToInclude) {
   const table = seatingData.tables.find((t) => t.number === tableNumber);
 
   if (!table) {
-    console.error("❌ Table not found");
+    devError("❌ Table not found");
     return;
   }
 
@@ -1309,7 +1369,7 @@ function executeBulkAssignment(tableNumber, guestsToAdd, householdsToInclude) {
           if (currentTable && currentTable !== tableNumber) {
             removeGuestFromAllTables(member.name, seatingData.tables);
             refreshTable(currentTable);
-            console.log(
+            devLog(
               `🔄 Removed ${member.name} from Table ${currentTable} to seat with household`,
             );
           }
@@ -1323,17 +1383,8 @@ function executeBulkAssignment(tableNumber, guestsToAdd, householdsToInclude) {
     assignGuestToTable(guestName, tableNumber);
   });
 
-  bulkSelectedGuests.clear();
-  isBulkMode = false;
-  document.getElementById("bulkControlsSection").style.display = "none";
-  document.getElementById("bulkModeToggle").textContent = "📋 Bulk";
-  document.getElementById("bulkModeToggle").style.background = "#C68A65";
-  document.getElementById("bulkModeToggle").style.color = "white";
-
-  updateUnseatedPanel();
-  console.log(
-    `✅ ${guestsToAdd.length} guests assigned to Table ${tableNumber}`,
-  );
+  resetBulkMode();
+  devLog(`✅ ${guestsToAdd.length} guests assigned to Table ${tableNumber}`);
 }
 
 // Tab switching functionality
@@ -1464,8 +1515,14 @@ function renderSeatedList() {
 
       // Guest name and table
       const nameSpan = document.createElement("span");
-      nameSpan.innerHTML = `<strong>${guest.name}</strong> <span style="color: #999; font-size: 12px;">• Table ${guest.tableNumber}</span>`;
       nameSpan.style.flex = "1";
+      const strong = document.createElement("strong");
+      strong.textContent = guest.name;
+      nameSpan.appendChild(strong);
+      const tableLabel = document.createElement("span");
+      tableLabel.style.cssText = "color: #999; font-size: 12px;";
+      tableLabel.textContent = ` • Table ${guest.tableNumber}`;
+      nameSpan.appendChild(tableLabel);
       guestRow.appendChild(nameSpan);
 
       // Action buttons
@@ -1661,6 +1718,6 @@ function removeSeatedGuest(guestName, tableNumber) {
     updateUnseatedPanel();
     renderSeatedList();
 
-    console.log(`✅ ${guestName} removed from Table ${tableNumber}`);
+    devLog(`✅ ${guestName} removed from Table ${tableNumber}`);
   }
 }
