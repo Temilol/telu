@@ -501,6 +501,16 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
     min-width: 280px;
   `;
 
+  function closeOnOutside(e) {
+    if (!menu.contains(e.target) && menu.parentNode) {
+      closeMenu();
+    }
+  }
+  function closeMenu() {
+    document.removeEventListener("click", closeOnOutside);
+    if (menu.parentNode) menu.parentNode.removeChild(menu);
+  }
+
   const title = document.createElement("h3");
   let titleText = "Select a Table";
   if (guestName) {
@@ -563,7 +573,7 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
     btn.onmouseover = () => (btn.style.background = "#e6bb6f");
     btn.onmouseout = () => (btn.style.background = "#f0c891");
     btn.onclick = () => {
-      document.body.removeChild(menu);
+      closeMenu();
       callback(tableNum);
     };
     tablesContainer.appendChild(btn);
@@ -601,7 +611,7 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
   `;
   cancelBtn.onmouseover = () => (cancelBtn.style.background = "#dfc4b8");
   cancelBtn.onmouseout = () => (cancelBtn.style.background = "#E9D6CF");
-  cancelBtn.onclick = () => document.body.removeChild(menu);
+  cancelBtn.onclick = () => closeMenu();
   menu.appendChild(cancelBtn);
 
   // Create new table link
@@ -627,7 +637,7 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
   createLink.onmouseout = () => (createLink.style.color = "#C68A65");
   createLink.onclick = (e) => {
     e.stopPropagation();
-    document.body.removeChild(menu);
+    closeMenu();
     // Store pending guest(s) for the new table
     if (householdMembers && householdMembers.length > 0) {
       window.pendingGuestsForNewTable = householdMembers.map((m) => m.name);
@@ -645,12 +655,7 @@ function createTableMenu(callback, guestName = null, householdMembers = null) {
 
   // Add click-outside handler
   setTimeout(() => {
-    document.addEventListener("click", function closeOnOutside(e) {
-      if (!menu.contains(e.target) && menu.parentNode) {
-        document.body.removeChild(menu);
-        document.removeEventListener("click", closeOnOutside);
-      }
-    });
+    document.addEventListener("click", closeOnOutside);
   }, 50);
 }
 
@@ -816,6 +821,16 @@ function createBulkTableMenu(
     min-width: 280px;
   `;
 
+  function closeOnOutside(e) {
+    if (!menu.contains(e.target) && menu.parentNode) {
+      closeMenu();
+    }
+  }
+  function closeMenu() {
+    document.removeEventListener("click", closeOnOutside);
+    if (menu.parentNode) menu.parentNode.removeChild(menu);
+  }
+
   const title = document.createElement("h3");
   const titleText = `Assign ${selectedCount} guest${selectedCount === 1 ? "" : "s"} to table`;
   title.textContent = titleText;
@@ -868,7 +883,7 @@ function createBulkTableMenu(
     btn.onmouseover = () => (btn.style.background = "#e6bb6f");
     btn.onmouseout = () => (btn.style.background = "#f0c891");
     btn.onclick = () => {
-      document.body.removeChild(menu);
+      closeMenu();
       callback(tableNum);
     };
     tablesContainer.appendChild(btn);
@@ -905,7 +920,7 @@ function createBulkTableMenu(
   `;
   cancelBtn.onmouseover = () => (cancelBtn.style.background = "#dfc4b8");
   cancelBtn.onmouseout = () => (cancelBtn.style.background = "#E9D6CF");
-  cancelBtn.onclick = () => document.body.removeChild(menu);
+  cancelBtn.onclick = () => closeMenu();
   menu.appendChild(cancelBtn);
 
   // Create new table link
@@ -931,7 +946,7 @@ function createBulkTableMenu(
   createLink.onmouseout = () => (createLink.style.color = "#C68A65");
   createLink.onclick = (e) => {
     e.stopPropagation();
-    document.body.removeChild(menu);
+    closeMenu();
     // Store pending guests for the new table (bulk mode)
     window.pendingGuestsForNewTable = finalGuestNames
       ? [...finalGuestNames]
@@ -950,12 +965,7 @@ function createBulkTableMenu(
   document.body.appendChild(menu);
 
   setTimeout(() => {
-    document.addEventListener("click", function closeOnOutside(e) {
-      if (!menu.contains(e.target) && menu.parentNode) {
-        document.body.removeChild(menu);
-        document.removeEventListener("click", closeOnOutside);
-      }
-    });
+    document.addEventListener("click", closeOnOutside);
   }, 50);
 }
 
