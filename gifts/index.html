@@ -107,6 +107,28 @@
       color: var(--color-text);
       opacity: 0.85;
     }
+    
+    .breadcrumb {
+      max-width: 900px;
+      margin: 0 auto 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .breadcrumb a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .breadcrumb a:hover {
+      color: #9B6D54;
+      text-decoration: underline;
+    }
+    
+    .breadcrumb span {
+      margin: 0 8px;
+    }
 
     .container {
       max-width: 900px;
@@ -187,6 +209,13 @@
       border-radius: 4px;
       font-weight: 500;
       color: var(--color-primary);
+    }
+
+    .gift-card .details img {
+      width: min(100%, 350px);
+      height: auto;
+      display: block;
+      border-radius: 8px;
     }
 
     .registry-section {
@@ -299,6 +328,10 @@
         grid-template-columns: 1fr;
       }
 
+      .gifts-grid > :last-child {
+        max-width: none;
+      }
+
       .registry-section {
         padding: 30px 20px;
       }
@@ -306,17 +339,27 @@
       .registry-section h2 {
         font-size: 1.6rem;
       }
+
+      footer a {
+        display: block;
+        margin-top: 10px;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>💝 Gifts & Registry</h1>
-    <p>Thank you for celebrating with us!</p>
-  </header>
+    <h1>Toluwani &amp; Temilola - Gifts &amp; Registry</h1>
+    <p>Thank you for being part of our special day! <br> Below you'll find our wedding registry and various gift options.</p>
+    </header>
 
   <main>
     <div class="container">
+  
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Home</a><span>/</span><span>Gifts &amp; Registry</span>
+      </nav>
+  
       <div class="registry-section">
         <h2>Wedding Registry</h2>
         <p>Browse our wishlist for curated experiences and items we love</p>
@@ -375,7 +418,7 @@
             <i class="fas fa-qrcode"></i>
             <h3>Venmo</h3>
             <div class="details">
-                <img src="venmo.jpg" alt="Venmo QR Code" style="width: 350px; height: 350px; border-radius: 8px;">
+              <img src="venmo.jpg" alt="Venmo QR Code">
             </div>
             <p style="font-size: 0.9rem; opacity: 0.8;"><span>Username: <code>@Toluwani-Taiwo</code></span></p>
         </div>
@@ -385,7 +428,7 @@
           <i class="fas fa-mobile-alt"></i>
           <h3>Cash App</h3>
           <div class="details">
-            <img src="cashapp.jpg" alt="Cash App QR Code" style="width: 350px; height: 350px; border-radius: 8px;">
+            <img src="cashapp.jpg" alt="Cash App QR Code">
           </div>  
           <p style="font-size: 0.9rem; opacity: 0.8;"><span>Username: <code>$ToluwaniTaiwo</code></span></p>
         </div>
@@ -395,7 +438,7 @@
           <i class="fab fa-paypal"></i>
           <h3>PayPal</h3>
           <div class="details">
-            <img src="paypal.jpg" alt="PayPal QR Code" style="width: 350px; height: 350px; border-radius: 8px;">
+            <img src="paypal.jpg" alt="PayPal QR Code">
           </div>
         </div>
       </div>
